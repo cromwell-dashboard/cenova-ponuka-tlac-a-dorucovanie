@@ -382,6 +382,76 @@ ul.dotList li::before{content:""; position:absolute; left:0; top:7px; width:4px;
 .ts-modra table.prices tbody tr:nth-child(even):not(.tot) td{background:#F5F5F6}
 .ts-modra table.prices tr.tot td{border-bottom:0}
 .ts-modra table.prices tbody tr:first-child td:first-child{border-top-left-radius:0}
+.sumCell{font-weight:600; text-align:right}
+
+.specRow{grid-template-columns:38% 1fr 20px 20px 24px!important; align-items:center}
+.mv{border:0; background:transparent; color:var(--muted); font-size:13px; border-radius:6px; height:30px; padding:0}
+.mv:hover:not(:disabled){background:var(--bg); color:var(--blue)}
+.mv:disabled{opacity:.25; cursor:default}
+.addInline{flex-direction:row!important; align-items:stretch}
+.addInline .add{flex:1}
+.addInline select{width:46%}
+
+/* automatické zhustenie strany, aby sa zmestili obchodné podmienky */
+.page.c1 .hdr{margin-bottom:34px!important}
+.page.c1 .block{margin-bottom:12px!important}
+.page.c1 .lblRow{margin-bottom:7px!important}
+.page.c1 .spec{gap:2px 26px!important; line-height:1.38}
+.page.c1 table.prices td{padding:5px 8px!important}
+.page.c1 table.prices th{padding:5px 8px!important}
+.page.c1 .ts-karta{padding:5px 14px 4px!important}
+.page.c2 .hdr{margin-bottom:24px!important}
+.page.c2 .block{margin-bottom:8px!important}
+.page.c2 .lblRow{margin-bottom:5px!important}
+.page.c2 .pill{padding:4px 12px!important; margin-bottom:6px}
+.page.c2 .spec{gap:1px 22px!important; line-height:1.3; font-size:10.2px!important}
+.page.c2 table.prices{font-size:10.2px!important}
+.page.c2 table.prices td{padding:3.5px 8px!important}
+.page.c2 table.prices th{padding:4px 8px!important}
+.page.c2 table.prices tr.tot td{padding-top:5px!important}
+.page.c2 .ts-karta{padding:3px 12px 2px!important}
+.page.c2 .note{margin-top:6px; padding:2px 0 2px 10px}
+.page.c2 .condBlock img.photoImg{width:150px!important; height:118px!important}
+.page.c2 .condBlock{grid-template-columns:150px 1fr!important}
+.page.c2 ul.doc.small li{margin-bottom:1px}
+
+/* moderné rozloženie strany s cenami */
+.secHead{display:flex; align-items:center; gap:14px; margin-bottom:12px}
+.secHead .pill{margin:0; min-width:160px; text-align:center}
+.secHead .rule{flex:1; height:1.5px; background:#E6E7EB}
+.secHead .meta{font-size:9.5px; color:#7A8199; letter-spacing:.3px; white-space:nowrap}
+.specGrid{display:grid; grid-template-columns:1fr 1fr; gap:8px; grid-auto-flow:row dense}
+.specGrid .sp{background:#EFEFF0; border-radius:10px; padding:8px 13px 9px}
+.specGrid .sp.wide{grid-column:1 / -1}
+.specGrid .k{font-size:8.3px; text-transform:uppercase; letter-spacing:.6px; color:#6B7390; font-weight:600; margin-bottom:2px}
+.specGrid .v{font-size:10.8px; line-height:1.4; color:#141828}
+.totCard{margin:12px 0 0 auto; width:270px; background:#3552CC; color:#fff; border-radius:12px; padding:12px 18px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 8px 20px rgba(53,82,204,.22)}
+.totCard span{font-size:10.5px; font-weight:400; letter-spacing:.2px}
+.totCard b{font-size:17px; font-weight:700}
+.condModern{display:grid; grid-template-columns:170px 1fr; gap:20px; align-items:center; background:#EFEFF0; border-radius:14px; padding:14px}
+.condModern .photoImg{border-radius:10px!important}
+.condTtl{font-size:12.5px; font-weight:700; color:#3552CC; margin-bottom:6px; letter-spacing:.2px}
+.condModern ul.doc.small li::before{background:#3552CC}
+.page.c1 .specGrid{gap:6px} .page.c1 .specGrid .sp{padding:6px 12px 7px}
+.page.c1 .secHead{margin-bottom:8px}
+.page.c2 .specGrid{gap:4px} .page.c2 .specGrid .sp{padding:4px 11px 5px}
+.page.c2 .specGrid .v{font-size:10px; line-height:1.3}
+.page.c2 .totCard{margin-top:8px; padding:8px 16px}
+.page.c2 .condModern{padding:10px; grid-template-columns:140px 1fr}
+.page.c2 .condModern img.photoImg{width:140px!important; height:110px!important}
+
+/* moderná špecifikácia – čistý zoznam bez dlaždíc */
+.specList{border-top:1px solid #E6E7EB}
+.specList .sr{display:grid; grid-template-columns:160px 1fr; gap:0 26px; padding:6px 0; border-bottom:1px solid #E6E7EB; font-size:10.8px; line-height:1.45}
+.specList .k{font-weight:600; color:#141828}
+.specList .v{color:#2A2F45}
+.page.c1 .specList .sr{padding:4px 0}
+.page.c2 .specList .sr{padding:2.5px 0; font-size:10.2px; line-height:1.32}
+
+/* v9 – bez linky pri nadpisoch, podmienky bez sivého podfarbenia */
+.secHead .rule{background:transparent!important}
+.condModern{background:transparent!important; padding:0!important; border-radius:0!important}
+.page.c2 .condModern{padding:0!important}
 </style>
 </head>
 <body>
@@ -713,9 +783,17 @@ const activeSvcs = () => Q.services.filter(s=>s.on);
 /* ════════════════ čísla ════════════════ */
 function num(v){ if(v===""||v==null) return NaN; const s=String(v).replace(/\s|\u00a0/g,"").replace(",","."); return /^-?\d+(\.\d+)?$/.test(s)? parseFloat(s): NaN; }
 function fmtQty(v){ const n=num(v); return isNaN(n)? String(v||"") : n.toLocaleString("sk-SK",{maximumFractionDigits:2}); }
-function fmtPrice(n){ return n.toLocaleString("sk-SK",{minimumFractionDigits:2,maximumFractionDigits:3})+" €"; }
+function fmtPrice(n){ return n.toLocaleString("sk-SK",{minimumFractionDigits:2,maximumFractionDigits:4})+" €"; }
 function fmtSum(n){ return n.toLocaleString("sk-SK",{minimumFractionDigits:2,maximumFractionDigits:2})+" €"; }
-function rowTotal(r){ const q=num(r.qty), p=num(r.price); if(isNaN(q)||isNaN(p)) return NaN; return r.unit==="1000 ks"? q/1000*p : q*p; }
+function fmtIn(n,d){ return isNaN(n)?"":n.toLocaleString("sk-SK",{maximumFractionDigits:d,useGrouping:false}); }
+function unitFactor(r){ return r.unit==="1000 ks"? 1/1000 : 1; }
+function derive(r){ // dopočíta druhú hodnotu podľa toho, čo obchodník zadal
+  const q=num(r.qty);
+  if(r.mode==="total"){ const t=num(r.sum); r.price = (isNaN(q)||isNaN(t)||q===0)? "" : fmtIn(t/(q*unitFactor(r)),4); }
+  else { const pr=num(r.price); r.sum = (isNaN(q)||isNaN(pr))? "" : fmtIn(q*unitFactor(r)*pr,2); }
+}
+function showSumRow(s){ return s.showSumRow!==undefined ? s.showSumRow : s.showTotal!==false; }
+function rowTotal(r){ if(r.mode==="total"){ const t=num(r.sum); if(!isNaN(t)) return t; } const q=num(r.qty), p=num(r.price); if(isNaN(q)||isNaN(p)) return NaN; return r.unit==="1000 ks"? q/1000*p : q*p; }
 function svcTotal(s){ let t=0, any=false; s.rows.forEach(r=>{ const v=rowTotal(r); if(!isNaN(v)){t+=v; any=true;} }); return any? t: NaN; }
 
 /* ════════════════ formulár ════════════════ */
@@ -755,8 +833,9 @@ function renderForm(){
     h += `<div class="card svc ${s.open?"":"closed"}"><h3 data-fold="${i}">${esc(d.name)} <small>${isNaN(tot)?"":fmtSum(tot)}</small><span class="chev">▾</span></h3><div class="body">
       ${(d.addons||[]).map(a=>{ const on=(s.addons||[]).includes(a.id); return `<button class="add" style="margin-top:8px;${on?"color:var(--warn)":""}" data-addon="${i}.${a.id}">${on?"− Odobrať":"+ Pridať"}: ${esc(a.label)}</button>`; }).join("")}
       <div class="sub">Špecifikácia</div>
-      ${s.spec.map((r,j)=>`<div class="specRow"><input class="cell" data-p="services.${i}.spec.${j}.0" value="${esc(r[0])}"><input class="cell" data-p="services.${i}.spec.${j}.1" value="${esc(r[1])}" placeholder="doplňte"><button class="x" data-delspec="${i}.${j}" aria-label="Odstrániť">×</button></div>`).join("")}
-      <button class="add" data-addspec="${i}">+ Pridať parameter</button>
+      ${s.spec.map((r,j)=>`<div class="specRow"><input class="cell" data-p="services.${i}.spec.${j}.0" value="${esc(r[0])}"><input class="cell" data-p="services.${i}.spec.${j}.1" value="${esc(r[1])}" placeholder="doplňte"><button class="mv" data-mvspec="${i}.${j}.-1" aria-label="Posunúť vyššie" ${j===0?"disabled":""}>↑</button><button class="mv" data-mvspec="${i}.${j}.1" aria-label="Posunúť nižšie" ${j===s.spec.length-1?"disabled":""}>↓</button><button class="x" data-delspec="${i}.${j}" aria-label="Odstrániť">×</button></div>`).join("")}
+      <div class="addWith addInline"><button class="add" data-addspec="${i}">+ Pridať parameter</button>
+        <select class="cell" data-specpos="${i}" title="Kam vložiť nový parameter"><option value="end">na koniec</option><option value="-1">na začiatok</option>${s.spec.map((r,j)=>`<option value="${j}">za ${esc((r[0]||(j+1)+". parameter").slice(0,24))}</option>`).join("")}</select></div>
 
 
       <div class="sub">Ceny</div>
@@ -768,7 +847,7 @@ function renderForm(){
         <input class="cell" data-p="services.${i}.rows.${j}.qty" value="${esc(r.qty)}" placeholder="2 600" inputmode="decimal">
         <select class="cell unitSel" data-p="services.${i}.rows.${j}.unit">${["ks","1000 ks"].map(u=>`<option ${u===r.unit?"selected":""}>${u}</option>`).join("")}</select>
         <input class="cell" data-p="services.${i}.rows.${j}.price" value="${esc(r.price)}" placeholder="0,000" inputmode="decimal">
-        <span class="cellTot" data-rt="${i}.${j}">${isNaN(rowTotal(r))?"—":fmtSum(rowTotal(r))}</span>
+        <input class="cell sumCell" data-p="services.${i}.rows.${j}.sum" value="${esc(r.mode==="total"? (r.sum||"") : fmtIn(rowTotal(r),2))}" placeholder="spolu" inputmode="decimal" title="Cena spolu – ak ju zadáte, cena za jednotku sa dopočíta">
         <button class="x" data-delrow="${i}.${j}" aria-label="Odstrániť riadok">×</button></div>`).join("")}
       <div class="addGrid">
         <div class="addWith"><button class="add" data-addrow="${i}">+ Pridať riadok</button>
@@ -776,7 +855,8 @@ function renderForm(){
         <div class="addWith"><button class="add" data-addcol="${i}">+ Pridať stĺpec</button>
           <select class="cell" data-colpos="${i}" title="Kam vložiť nový stĺpec">${COLPOS.map(([v,l])=>`<option value="${v}">${l}</option>`).join("")}</select></div>
       </div>
-      <label class="totTog"><input type="checkbox" data-tottog="${i}" ${s.showTotal!==false?"checked":""}> Zobraziť v ponuke stĺpec „Cena spolu“ a súčtový riadok</label>
+      <label class="totTog"><input type="checkbox" data-tottog="${i}" ${s.showTotal!==false?"checked":""}> Zobraziť v ponuke stĺpec „Cena spolu“</label>
+      <label class="totTog" style="margin-top:4px"><input type="checkbox" data-sumtog="${i}" ${showSumRow(s)?"checked":""}> Zobraziť v ponuke súčtový riadok</label>
       <div class="sumLine">Spolu: <b data-sum="${i}">${isNaN(tot)?"—":fmtSum(tot)}</b> bez DPH</div>
       <p class="hint" style="margin-top:6px">Ak do množstva napíšete rozpätie (napr. 100 000 – 149 999), riadok sa zobrazí ako cenník bez súčtu. Pri pridávaní riadka alebo stĺpca si v rozbaľovacom zozname vyberte, kam sa má vložiť. Umiestnenie stĺpca v PDF zmeníte aj neskôr v políčku pri jeho názve.</p>
 
@@ -793,6 +873,7 @@ function renderForm(){
     </div></div>`;
   });
 
+  h += `<div class="card"><h3>Rozloženie strany s cenami</h3><div class="body"><div class="tiles">${[["klasicke","Klasické"],["moderne","Moderné"]].map(([v,l])=>`<button class="tile ${(Q.pageLayout||"klasicke")===v?"on":""}" data-layout="${v}"><span class="box"></span>${l}</button>`).join("")}</div></div></div>`;
   h += `<div class="card"><h3>Štýl tabuliek cien</h3><div class="body"><div class="tiles three">${TSTYLES.map(([v,l])=>`<button class="tile ${(Q.tableStyle||"minimal")===v?"on":""}" data-tstyle="${v}"><span class="box"></span>${l}</button>`).join("")}</div></div></div>`;
   h += `<div class="card"><h3>Záver ponuky</h3><div class="body">${field("Text záveru","closing",{area:1,rows:5})}</div></div>`;
   f.innerHTML = h;
@@ -800,8 +881,13 @@ function renderForm(){
 }
 const TSTYLES=[["karta","Karta"],["modra","Modrá hlavička"],["minimal","Minimal"]];
 const COLPOS=[["name","za Položkou"],["qty","za Množstvom"],["price","za Cenou / j."],["total","na koniec"]];
-function normCols(s){ s.cols=s.cols||[]; s.colPos=s.colPos||[]; while(s.colPos.length<s.cols.length) s.colPos.push("name"); s.rows.forEach(r=>{ r.x=r.x||[]; while(r.x.length<s.cols.length) r.x.push(""); }); }
+function normCols(s){ if(s.showSumRow===undefined) s.showSumRow = s.showTotal!==false; s.cols=s.cols||[]; s.colPos=s.colPos||[]; while(s.colPos.length<s.cols.length) s.colPos.push("name"); s.rows.forEach(r=>{ r.x=r.x||[]; while(r.x.length<s.cols.length) r.x.push(""); }); }
 function gridCols(s){ return "grid-template-columns:minmax(90px,1fr) "+s.cols.map(()=>"54px ").join("")+"52px 56px 52px 64px 18px"; }
+function specWide(spec){ // dlhé hodnoty cez celú šírku, osamotená krátka dlaždica sa roztiahne
+  const W=spec.map(r=>((r[0]||"")+(r[1]||"")).length>62); const out=[]; let col=0;
+  spec.forEach((r,i)=>{ let w=W[i]; if(!w && col===0 && (i===spec.length-1 || W[i+1])) w=true; out.push([r,w]); col = w?0:(col+1)%2; });
+  return out;
+}
 function fullName(p){ return [p.title,p.first,p.last].filter(Boolean).join(" "); }
 
 $("#form").addEventListener("input", e=>{
@@ -809,18 +895,22 @@ $("#form").addEventListener("input", e=>{
   set(p, e.target.value); dirty=true;
   if(/\.rows\./.test(p)){ // live súčty bez prekreslenia formulára
     const i=+p.split(".")[1], t=svcTotal(Q.services[i]);
-    const j=+p.split(".")[3], rtEl=document.querySelector(`[data-rt="${i}.${j}"]`); if(rtEl){ const v=rowTotal(Q.services[i].rows[j]); rtEl.textContent=isNaN(v)?"—":fmtSum(v); }
-    const el=document.querySelector(`[data-sum="${i}"]`); if(el) el.textContent=isNaN(t)?"—":fmtSum(t);
-    const sm=el?.closest(".svc")?.querySelector("h3 small"); if(sm) sm.textContent=isNaN(t)?"":fmtSum(t);
+    const j=+p.split(".")[3], fld=p.split(".")[4], r=Q.services[i].rows[j];
+    if(fld==="price"){ r.mode="unit"; derive(r); const o=document.querySelector(`[data-p="services.${i}.rows.${j}.sum"]`); if(o) o.value=r.sum; }
+    else if(fld==="sum"){ r.mode="total"; derive(r); const o=document.querySelector(`[data-p="services.${i}.rows.${j}.price"]`); if(o) o.value=r.price; }
+    else if(fld==="qty"){ derive(r); const o=document.querySelector(`[data-p="services.${i}.rows.${j}.${r.mode==="total"?"price":"sum"}"]`); if(o) o.value=r.mode==="total"?r.price:r.sum; }
+    const t2=svcTotal(Q.services[i]); const el=document.querySelector(`[data-sum="${i}"]`); if(el) el.textContent=isNaN(t2)?"—":fmtSum(t2);
+    const sm=el?.closest(".svc")?.querySelector("h3 small"); if(sm) sm.textContent=isNaN(t2)?"":fmtSum(t2);
   }
   schedulePreview();
 });
-$("#form").addEventListener("change", e=>{ if(e.target.dataset.colposset){ const [i,k]=e.target.dataset.colposset.split(".").map(Number); Q.services[i].colPos[k]=e.target.value; dirty=true; renderPreview(); return; } if(e.target.dataset.rowpos!=null||e.target.dataset.colpos!=null) return; if(e.target.dataset.tottog!=null){ Q.services[+e.target.dataset.tottog].showTotal=e.target.checked; dirty=true; renderPreview(); return; } if(/\.cols\./.test(e.target.dataset.p||"")){ renderAll(); return; } if(e.target.tagName==="SELECT"){ set(e.target.dataset.p,e.target.value); dirty=true; renderAll(); } });
+$("#form").addEventListener("change", e=>{ if(e.target.dataset.colposset){ const [i,k]=e.target.dataset.colposset.split(".").map(Number); Q.services[i].colPos[k]=e.target.value; dirty=true; renderPreview(); return; } if(e.target.dataset.rowpos!=null||e.target.dataset.colpos!=null||e.target.dataset.specpos!=null) return; if(e.target.dataset.tottog!=null){ Q.services[+e.target.dataset.tottog].showTotal=e.target.checked; dirty=true; renderPreview(); return; } if(e.target.dataset.sumtog!=null){ Q.services[+e.target.dataset.sumtog].showSumRow=e.target.checked; dirty=true; renderPreview(); return; } if(/\.cols\./.test(e.target.dataset.p||"")){ renderAll(); return; } if(e.target.tagName==="SELECT"){ set(e.target.dataset.p,e.target.value); const m=(e.target.dataset.p||"").match(/^services\.(\d+)\.rows\.(\d+)\.unit$/); if(m) derive(Q.services[+m[1]].rows[+m[2]]); dirty=true; renderAll(); } });
 $("#form").addEventListener("click", e=>{
-  const t=e.target.closest("[data-tog],[data-fold],[data-addrow],[data-delrow],[data-addspec],[data-delspec],[data-go],[data-addon],[data-addcol],[data-delcol],[data-tstyle]"); if(!t) return;
+  const t=e.target.closest("[data-tog],[data-fold],[data-addrow],[data-delrow],[data-addspec],[data-delspec],[data-go],[data-addon],[data-addcol],[data-delcol],[data-tstyle],[data-mvspec],[data-layout]"); if(!t) return;
   e.preventDefault();
   if(t.dataset.go){ show(t.dataset.go); return; }
   if(t.dataset.tstyle){ Q.tableStyle=t.dataset.tstyle; }
+  if(t.dataset.layout){ Q.pageLayout=t.dataset.layout; if(t.dataset.layout==="moderne") Q.tableStyle="karta"; }
   if(t.dataset.addon){ toggleAddon(...t.dataset.addon.split(".")); }
   if(t.dataset.tog!=null){ const s=Q.services[+t.dataset.tog]; s.on=!s.on; if(!activeSvcs().length){ s.on=true; toast("Ponuka musí mať aspoň jednu službu."); } }
   if(t.dataset.fold!=null){ const s=Q.services[+t.dataset.fold]; s.open=!s.open; renderForm(); return; }
@@ -831,7 +921,8 @@ $("#form").addEventListener("click", e=>{
     const pos=document.querySelector(`[data-colpos="${i}"]`)?.value||"name"; sv.cols.push("Nový stĺpec"); sv.colPos.push(pos); normCols(sv); }
   if(t.dataset.delcol){ const [i,k]=t.dataset.delcol.split(".").map(Number); const sv=Q.services[i]; sv.cols.splice(k,1); (sv.colPos||[]).splice(k,1); sv.rows.forEach(r=>r.x&&r.x.splice(k,1)); }
   if(t.dataset.delrow){ const [i,j]=t.dataset.delrow.split(".").map(Number); Q.services[i].rows.splice(j,1); }
-  if(t.dataset.addspec!=null) Q.services[+t.dataset.addspec].spec.push(["",""]);
+  if(t.dataset.addspec!=null){ const i=+t.dataset.addspec, sv=Q.services[i]; const pos=document.querySelector(`[data-specpos="${i}"]`)?.value||"end"; if(pos==="end") sv.spec.push(["",""]); else sv.spec.splice(+pos+1,0,["",""]); }
+  if(t.dataset.mvspec){ const [i,j,d]=t.dataset.mvspec.split(".").map(Number), sp=Q.services[i].spec, k=j+d; if(k>=0&&k<sp.length){ [sp[j],sp[k]]=[sp[k],sp[j]]; } }
   if(t.dataset.delspec){ const [i,j]=t.dataset.delspec.split(".").map(Number); Q.services[i].spec.splice(j,1); }
   dirty=true; renderAll();
 });
@@ -917,14 +1008,17 @@ function buildPages(){
     const ben=lines(s.benefits), cond=lines(s.conditions);
     const spec=s.spec.filter(r=>r[0]||r[1]);
     normCols(s); const cols=s.cols; const rows=s.rows.filter(r=>r.name||r.qty||r.price||(r.x||[]).some(v=>v));
-    const anyTotal = s.showTotal!==false && rows.some(r=>!isNaN(rowTotal(r)));
+    const computable = rows.some(r=>!isNaN(rowTotal(r))); const anyTotal = s.showTotal!==false && computable; const sumRow = showSumRow(s) && computable;
     const unitHdr = rows.every(r=>r.unit==="1000 ks")? "Cena za 1000 ks" : rows.every(r=>r.unit==="ks")? "Cena / ks" : "Cena / j.";
     const blocks=[], ph=PHOTO(d.photo);
     if(s!==first){
       if(s.intro.trim()) blocks.push(`<p class="block introTxt" style="margin-top:0">${rt(s.intro)}</p>`);
       const bh=benHTML(s); if(bh) blocks.push(`<div class="block"><div class="h2doc big">HLAVNÉ PRÍNOSY SPOLUPRÁCE</div>${bh}</div>`);
     }
-    if(spec.length) blocks.push(`<div class="block"><div class="lblRow"><span class="pill">ŠPECIFIKÁCIA</span><span class="pill wide light">CENOVÁ PONUKA ${esc(qnum)}</span></div><div class="spec">${spec.map(r=>`<div class="l">${esc(r[0])}</div><div>${rt(r[1])||"<span style='color:#B0B5C8'>—</span>"}</div>`).join("")}</div></div>`);
+    const MOD = (Q.pageLayout||"klasicke")==="moderne";
+    if(spec.length && MOD) blocks.push(`<div class="block"><div class="secHead"><span class="pill">ŠPECIFIKÁCIA</span><span class="rule"></span><span class="meta">Cenová ponuka č. ${esc(qnum)}</span></div>
+      <div class="specList">${spec.map(r=>`<div class="sr"><div class="k">${esc(r[0])}</div><div class="v">${rt(r[1])||"<span style='color:#B0B5C8'>—</span>"}</div></div>`).join("")}</div></div>`);
+    else if(spec.length) blocks.push(`<div class="block"><div class="lblRow"><span class="pill">ŠPECIFIKÁCIA</span><span class="pill wide light">CENOVÁ PONUKA ${esc(qnum)}</span></div><div class="spec">${spec.map(r=>`<div class="l">${esc(r[0])}</div><div>${rt(r[1])||"<span style='color:#B0B5C8'>—</span>"}</div>`).join("")}</div></div>`);
     if(rows.length){
       const X=pos=>cols.map((c,k)=>({c,k})).filter(o=>(s.colPos[o.k]||"name")===pos).map(o=>({h:esc(o.c), cls:"", v:r=>rt(r.x[o.k]||"")}));
       const C=[{h:"Položka",cls:"",v:r=>esc(r.name)}, ...X("name"),
@@ -933,20 +1027,23 @@ function buildPages(){
       const totIdx = anyTotal? C.length : -1;
       if(anyTotal) C.push({h:"Cena spolu",cls:"n",v:r=>{const t=rowTotal(r); return isNaN(t)?"–":fmtSum(t);}});
       C.push(...X("total"));
-      blocks.push(`<div class="block"><span class="pill">CENY</span>
+      blocks.push(`<div class="block">${MOD?`<div class="secHead"><span class="pill">CENY</span><span class="rule"></span><span class="meta">všetky ceny sú uvedené bez DPH</span></div>`:`<span class="pill">CENY</span>`}
         <div class="tblWrap ts-${Q.tableStyle||"minimal"}"><table class="prices"><thead><tr>${C.map(c=>`<th class="${c.cls.includes("n")?"n":""}">${c.h}</th>`).join("")}</tr></thead><tbody>
         ${rows.map(r=>`<tr>${C.map(c=>`<td class="${c.cls}">${c.v(r)}</td>`).join("")}</tr>`).join("")}
-        ${anyTotal&&!isNaN(tot)?`<tr class="tot"><td colspan="${totIdx}">Spolu bez DPH</td><td class="n">${fmtSum(tot)}</td>${C.slice(totIdx+1).map(()=>"<td></td>").join("")}</tr>`:""}
-        </tbody></table></div>${s.note&&s.note.trim()?`<div class="note">${esc(s.note)}</div>`:""}</div>`);
+        ${sumRow&&!isNaN(tot)&&!MOD? (anyTotal? `<tr class="tot"><td colspan="${totIdx}">Spolu bez DPH</td><td class="n">${fmtSum(tot)}</td>${C.slice(totIdx+1).map(()=>"<td></td>").join("")}</tr>` : `<tr class="tot"><td colspan="${C.length-1}">Spolu bez DPH</td><td class="n">${fmtSum(tot)}</td></tr>`) :""}
+        </tbody></table></div>${MOD&&sumRow&&!isNaN(tot)?`<div class="totCard"><span>Spolu bez DPH</span><b>${fmtSum(tot)}</b></div>`:""}${s.note&&s.note.trim()?`<div class="note">${esc(s.note)}</div>`:""}</div>`);
     }
-    if(cond.length) blocks.push(`<div class="block condBlock" style="display:grid; grid-template-columns:190px 1fr; gap:22px; align-items:start">
+    if(cond.length && MOD) blocks.push(`<div class="block condBlock condModern">
+        <img class="photoImg" src="${PHOTO_S(d.photo)}" width="170" height="134" style="width:170px;height:134px" alt="">
+        <div><div class="condTtl">Obchodné podmienky</div><ul class="doc small">${cond.map(b=>`<li>${rt(b)}</li>`).join("")}</ul></div></div>`);
+    else if(cond.length) blocks.push(`<div class="block condBlock" style="display:grid; grid-template-columns:190px 1fr; gap:22px; align-items:start">
         <img class="photoImg" src="${PHOTO_S(d.photo)}" width="190" height="150" style="width:190px;height:150px" alt="">
         <div><span class="pill wide">OBCHODNÉ PODMIENKY</span><ul class="doc small">${cond.map(b=>`<li>${rt(b)}</li>`).join("")}</ul></div></div>`);
     return {sub:svcTitle(s), blocks};
   });
 
   const cl=lines(Q.closing);
-  const shown = act.filter(s=>s.showTotal!==false); const grand = shown.map(svcTotal).filter(v=>!isNaN(v));
+  const shown = act.filter(s=>showSumRow(s)); const grand = shown.map(svcTotal).filter(v=>!isNaN(v));
   const fin=[];
   if(act.length>1&&grand.length>1) fin.push(`<div class="block"><span class="pill">SÚHRN</span><div class="tblWrap ts-${Q.tableStyle||"minimal"}"><table class="prices"><tbody>${shown.map(s=>{const t=svcTotal(s); return isNaN(t)?"":`<tr><td>${esc(svcTitle(s))}</td><td class="n">${fmtSum(t)}</td></tr>`;}).join("")}<tr class="tot"><td>Spolu bez DPH</td><td class="n">${fmtSum(grand.reduce((a,b)=>a+b,0))}</td></tr></tbody></table></div></div>`);
   fin.push(`<div class="block"><span class="pill" style="width:300px; text-align:center">REFERENCIE</span>
@@ -963,11 +1060,18 @@ function buildPages(){
   const meas=$("#stage"); meas.innerHTML=`<div class="page"><div class="pg-inner" id="mInner"></div></div>`;
   const inner=$("#mInner"), LIMIT=1123-72;
   const pages=[]; let cur=null;
-  const open=sub=>{ cur={sub,html:[],bottom:""}; pages.push(cur); inner.innerHTML=pageHeader(sub); };
+  const mPage=meas.firstElementChild;
+  const setC=c=>{ mPage.classList.remove("c1","c2"); if(c) mPage.classList.add(c); };
+  const open=sub=>{ cur={sub,html:[],bottom:"",cls:""}; pages.push(cur); setC(""); inner.innerHTML=pageHeader(sub); };
   const fits=html=>{ inner.insertAdjacentHTML("beforeend",html); const ok=inner.offsetHeight<=LIMIT; if(!ok) inner.lastElementChild.remove(); return ok; };
   const isBottom=b=>b.includes("condBlock");
   const place=(b,sub)=>{
-    if(cur.bottom || !fits(b)){ open(sub+" (pokračovanie)"); inner.insertAdjacentHTML("beforeend",b); }
+    let ok = !cur.bottom && fits(b);
+    if(!ok && !cur.bottom){ // skúsi zhustiť medzery a tabuľky, aby sa blok ešte zmestil
+      for(const c of ["c1","c2"]){ if(cur.cls==="c2" && c==="c1") continue; setC(c); if(fits(b)){ cur.cls=c; ok=true; break; } }
+      if(!ok) setC(cur.cls);
+    }
+    if(!ok){ open(sub+" (pokračovanie)"); inner.insertAdjacentHTML("beforeend",b); }
     if(isBottom(b)) cur.bottom=b; else cur.html.push(b);
   };
   sections.forEach(sec=>{
@@ -985,7 +1089,7 @@ function buildPages(){
   const total=pages.length+2;
   const foot=n=>`<div class="pg-foot">${esc(P.company||"Cromwell a.s.")} · ${esc(qnum)}</div><div class="pg-num">${n} / ${total}</div>`;
   return `<div class="page cover">${cover}</div><div class="page intro">${introPage}</div>` +
-    pages.map((pg,i)=>`<div class="page"><div class="pg-inner${pg.final?" finInner":""}">${pageHeader(pg.sub)}${pg.final?`<div class="finBody">${pg.html.join("")}</div>`:pg.html.join("")}</div>${pg.bottom?`<div class="pgBottom">${pg.bottom}</div>`:""}${foot(i+3)}</div>`).join("");
+    pages.map((pg,i)=>`<div class="page ${pg.cls||""}"><div class="pg-inner${pg.final?" finInner":""}">${pageHeader(pg.sub)}${pg.final?`<div class="finBody">${pg.html.join("")}</div>`:pg.html.join("")}</div>${pg.bottom?`<div class="pgBottom">${pg.bottom}</div>`:""}${foot(i+3)}</div>`).join("");
 }
 
 /* fotka na 2. strane: výška = výška bloku OD/PRE (orez "cover" cez canvas, aby PDF sedelo) */
