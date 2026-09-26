@@ -452,6 +452,34 @@ ul.dotList li::before{content:""; position:absolute; left:0; top:7px; width:4px;
 .secHead .rule{background:transparent!important}
 .condModern{background:transparent!important; padding:0!important; border-radius:0!important}
 .page.c2 .condModern{padding:0!important}
+
+/* posledná strana – referencie, záver bez rámčeka, zhustenie */
+.refImg{width:100%; display:block; margin:0 auto}
+.closingTxt{font-size:11.5px; line-height:1.55; padding:0 4px}
+.finMeasure > .block{margin:0 0 16px!important}
+.page.ft1 .hdr{margin-bottom:32px!important}
+.page.ft1 .refImg{width:86%!important}
+.page.ft1 .finMeasure > .block{margin-bottom:12px!important}
+.page.ft2 .hdr{margin-bottom:24px!important}
+.page.ft2 .refImg{width:74%!important}
+.page.ft2 .closingTxt{font-size:10.8px; line-height:1.45}
+.page.ft2 .closingTxt p{margin-bottom:6px!important}
+.page.ft2 table.prices td{padding:5px 8px!important}
+.page.ft2 .sigWho{padding:13px 18px!important}
+.page.ft2 .finMeasure > .block{margin-bottom:9px!important}
+.page.ft3 .hdr{margin-bottom:18px!important}
+.page.ft3 .refImg{width:62%!important}
+.page.ft3 .closingTxt{font-size:10.3px; line-height:1.4}
+.page.ft3 table.prices{font-size:10.2px}
+.page.ft3 table.prices td{padding:3.5px 8px!important}
+.page.ft3 .sigWho{padding:10px 16px!important; font-size:10.3px}
+.page.ft3 .finMeasure > .block{margin-bottom:6px!important}
+
+/* v10 – súčet v modernom dizajne bez modrého boxu */
+.totCard{background:transparent!important; box-shadow:none!important; color:#3552CC!important; border-radius:0!important; padding:6px 16px 0!important; width:auto!important; justify-content:flex-end!important; gap:28px}
+.totCard span{font-weight:700!important; font-size:11.5px!important}
+.totCard b{font-size:15px!important; font-weight:700!important}
+.page.c2 .totCard{padding-top:3px!important}
 </style>
 </head>
 <body>
@@ -1048,8 +1076,8 @@ function buildPages(){
   if(act.length>1&&grand.length>1) fin.push(`<div class="block"><span class="pill">SÚHRN</span><div class="tblWrap ts-${Q.tableStyle||"minimal"}"><table class="prices"><tbody>${shown.map(s=>{const t=svcTotal(s); return isNaN(t)?"":`<tr><td>${esc(svcTitle(s))}</td><td class="n">${fmtSum(t)}</td></tr>`;}).join("")}<tr class="tot"><td>Spolu bez DPH</td><td class="n">${fmtSum(grand.reduce((a,b)=>a+b,0))}</td></tr></tbody></table></div></div>`);
   fin.push(`<div class="block"><span class="pill" style="width:300px; text-align:center">REFERENCIE</span>
       <p style="margin:0 0 12px">Spoločnosť Cromwell a. s. dlhodobo zabezpečuje ${act.some(s=>s.key==="ts"||s.key==="tl")&&!act.some(s=>s.key==="hp"||s.key==="nd")?"tlačové a kompletizačné služby":"poštové, tlačové a doručovacie služby"} nielen pre týchto významných klientov:</p>
-      <img src="${IMG_REFS[svcDef(act[0].key).refs]}" style="width:100%; display:block" alt=""></div>`);
-  fin.push(`<div class="greybox block">${cl.map((l,i)=>`<p style="margin:0 0 9px; ${i===0||i===cl.length-1?"font-weight:600":""}">${rt(l)}</p>`).join("")}</div>`);
+      <img class="refImg" src="${IMG_REFS[svcDef(act[0].key).refs]}" alt=""></div>`);
+  fin.push(`<div class="closingTxt block">${cl.map((l,i)=>`<p style="margin:0 0 9px; ${i===0||i===cl.length-1?"font-weight:600":""}">${rt(l)}</p>`).join("")}</div>`);
   fin.push(`<div class="sig block">
       <div class="sigWho"><b>${esc(fullName(P)||"Meno a priezvisko")}</b>${esc(P.position||"")}${P.phone?"<br>M: "+esc(P.phone):""}${P.email?"<br>"+esc(P.email):""}</div>
       <div class="addr sigAddr"><b style="color:#3552CC">${esc(P.company)}</b><br>${esc(P.address).replace(/,\s*/,"<br>")}</div></div>`);
@@ -1080,7 +1108,12 @@ function buildPages(){
       if(all){ cur.html.push(...sec.blocks); return; }
       inner.innerHTML=snapshot;
     }
-    if(sec.final){ open(sec.sub); cur.final=true; cur.html.push(...sec.blocks); return; }
+    if(sec.final){ open(sec.sub); cur.final=true; cur.html.push(...sec.blocks);
+      // posledná strana: ak sa nezmestí (napr. so súhrnom), postupne ju zhustí
+      inner.insertAdjacentHTML("beforeend",`<div class="finMeasure">${sec.blocks.join("")}</div>`);
+      for(const c of ["","ft1","ft2","ft3"]){ mPage.classList.remove("ft1","ft2","ft3"); if(c) mPage.classList.add(c); cur.cls=c; if(inner.offsetHeight<=1123-92) break; }
+      mPage.classList.remove("ft1","ft2","ft3");
+      return; }
     open(sec.sub);
     sec.blocks.forEach(b=>place(b,sec.sub));
   });
