@@ -480,6 +480,19 @@ ul.dotList li::before{content:""; position:absolute; left:0; top:7px; width:4px;
 .totCard span{font-weight:700!important; font-size:11.5px!important}
 .totCard b{font-size:15px!important; font-weight:700!important}
 .page.c2 .totCard{padding-top:3px!important}
+
+/* tlač / vektorové PDF */
+@page{size:A4; margin:0}
+@media print{
+  html,body{height:auto!important; background:#fff!important; padding:0!important; margin:0!important}
+  :root{padding:0!important}
+  .top,.form,.bar,.mobileSwitch,.toast,#vList,#vProfile,#stage{display:none!important}
+  .app,.main,.editorCol,#vEditor,.editor,.previewWrap{display:block!important; overflow:visible!important; height:auto!important; padding:0!important; margin:0!important; border:0!important; background:#fff!important}
+  #pages{transform:none!important; height:auto!important; margin:0!important; gap:0!important; display:block!important}
+  .page{box-shadow:none!important; outline:none!important; margin:0!important; break-after:page; page-break-after:always}
+  .page:last-child{break-after:auto; page-break-after:auto}
+  *{-webkit-print-color-adjust:exact!important; print-color-adjust:exact!important}
+}
 </style>
 </head>
 <body>
@@ -505,6 +518,7 @@ ul.dotList li::before{content:""; position:absolute; left:0; top:7px; width:4px;
       <div class="bar">
         <button class="btn" id="bNew" title="Začať novú ponuku">Nová</button>
         <button class="btn" id="bSave">Uložiť</button>
+        <button class="btn" id="bPrint" title="Ostré vektorové PDF cez tlač prehliadača – zvoľte Uložiť ako PDF">PDF HQ</button>
         <button class="btn primary" id="bPdf">Stiahnuť PDF</button>
       </div>
     </div>
@@ -811,7 +825,8 @@ const activeSvcs = () => Q.services.filter(s=>s.on);
 /* ════════════════ čísla ════════════════ */
 function num(v){ if(v===""||v==null) return NaN; const s=String(v).replace(/\s|\u00a0/g,"").replace(",","."); return /^-?\d+(\.\d+)?$/.test(s)? parseFloat(s): NaN; }
 function fmtQty(v){ const n=num(v); return isNaN(n)? String(v||"") : n.toLocaleString("sk-SK",{maximumFractionDigits:2}); }
-function fmtPrice(n){ return n.toLocaleString("sk-SK",{minimumFractionDigits:2,maximumFractionDigits:4})+" €"; }
+const PRICE4=["hp","ts"]; // služby, kde sa jednotková cena zobrazuje vždy na 4 desatinné miesta
+function fmtPrice(n,key){ const d=PRICE4.includes(key)?4:2; return n.toLocaleString("sk-SK",{minimumFractionDigits:d,maximumFractionDigits:4})+" €"; }
 function fmtSum(n){ return n.toLocaleString("sk-SK",{minimumFractionDigits:2,maximumFractionDigits:2})+" €"; }
 function fmtIn(n,d){ return isNaN(n)?"":n.toLocaleString("sk-SK",{maximumFractionDigits:d,useGrouping:false}); }
 function unitFactor(r){ return r.unit==="1000 ks"? 1/1000 : 1; }
@@ -1051,7 +1066,7 @@ function buildPages(){
       const X=pos=>cols.map((c,k)=>({c,k})).filter(o=>(s.colPos[o.k]||"name")===pos).map(o=>({h:esc(o.c), cls:"", v:r=>rt(r.x[o.k]||"")}));
       const C=[{h:"Položka",cls:"",v:r=>esc(r.name)}, ...X("name"),
         {h:"Množstvo",cls:"n",v:r=>esc(fmtQty(r.qty))}, ...X("qty"),
-        {h:unitHdr,cls:"n p",v:r=>{const p=num(r.price); return isNaN(p)?esc(r.price):fmtPrice(p);}}, ...X("price")];
+        {h:unitHdr,cls:"n p",v:r=>{const p=num(r.price); return isNaN(p)?esc(r.price):fmtPrice(p,s.key);}}, ...X("price")];
       const totIdx = anyTotal? C.length : -1;
       if(anyTotal) C.push({h:"Cena spolu",cls:"n",v:r=>{const t=rowTotal(r); return isNaN(t)?"–":fmtSum(t);}});
       C.push(...X("total"));
@@ -1180,9 +1195,9 @@ async function makePdf(){
     const pdf=new jsPDF({unit:"mm", format:"a4", compress:true});
     for(let i=0;i<pages.length;i++){
       pages[i].style.boxShadow="none";
-      const cv=await html2canvas(pages[i],{scale:2.2, backgroundColor:"#ffffff", useCORS:true, logging:false});
+      const cv=await html2canvas(pages[i],{scale:3.2, backgroundColor:"#ffffff", useCORS:true, logging:false});
       if(i) pdf.addPage();
-      pdf.addImage(cv.toDataURL("image/jpeg",0.9),"JPEG",0,0,210,297);
+      pdf.addImage(cv.toDataURL("image/jpeg",0.94),"JPEG",0,0,210,297,undefined,"FAST");
     }
     stage.innerHTML="";
     const client=(Q.client.name||"klient").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^\w]+/g,"_").replace(/^_|_$/g,"");
@@ -1275,6 +1290,12 @@ document.querySelectorAll(".mobileSwitch button").forEach(b=>b.addEventListener(
 }));
 $("#bSave").addEventListener("click",()=>saveQuote(false));
 $("#bPdf").addEventListener("click",makePdf);
+$("#bPrint").addEventListener("click", async ()=>{
+  if(renderPreview.over) toast("Pozor: niektorá strana je príliš dlhá (červený rámik).",3500);
+  renderPreview(); await fitIntroPhotos($("#pages")); await document.fonts.ready;
+  toast("V okne tlače zvoľte „Uložiť ako PDF“, okraje: Žiadne, a zapnite Grafiku pozadia.",6000);
+  setTimeout(()=>{ try{ window.print(); }catch(e){ toast("Tlač nie je v tomto prostredí dostupná – otvorte generátor cez web link."); } },400);
+});
 $("#bNew").addEventListener("click",()=>{ if(dirty && !confirm("Neuložené zmeny sa stratia. Začať novú ponuku?")) return; Q=newQuote(); dirty=false; renderAll(); });
 addEventListener("beforeunload", e=>{ if(dirty){ e.preventDefault(); e.returnValue=""; } });
 
