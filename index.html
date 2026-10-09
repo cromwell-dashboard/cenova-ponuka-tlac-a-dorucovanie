@@ -543,6 +543,10 @@ textarea.nameCell.open{grid-column:1 / -1; white-space:pre-wrap; overflow:hidden
 .resizer:hover::after,.resizer.drag::after{height:80px; margin-top:-40px}
 .resizer:hover::after,.resizer.drag::after{background:var(--blue)}
 @media print{ .resizer{display:none!important} }
+
+li.gapB{margin-top:12px!important}
+ul.sepList li.gapB{margin-top:14px!important}
+.clGap{height:10px}
 </style>
 </head>
 <body>
@@ -1103,6 +1107,10 @@ function toggleAddon(i,id){
 
 /* ════════════════ A4 náhľad ════════════════ */
 const rt = t => esc(t).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>");
+/* odstavce: zachová nové riadky, prázdne riadky aj viac medzier za sebou */
+const rtp = t => rt(String(t||"").replace(/\r/g,"").replace(/^\s*\n|\n\s*$/g,"").trim()).replace(/ {2}/g," &nbsp;").replace(/\n/g,"<br>");
+/* zoznam: 1 riadok = 1 bod, prázdny riadok = väčšia medzera pred ďalším bodom */
+function liHTML(t){ const out=[]; let gap=false; String(t||"").replace(/\r/g,"").split("\n").forEach(l=>{ l=l.trim(); if(!l){ if(out.length) gap=true; return; } out.push(`<li${gap?' class="gapB"':""}>${rt(l)}</li>`); gap=false; }); return out.join(""); }
 const lines = t => String(t||"").split("\n").map(s=>s.trim()).filter(Boolean);
 function pageHeader(sub){ return `<div class="hdr"><div class="mk"><img src="${IMG_WORDMARK}" alt="Cromwell"></div><div class="ttl"><h1>CENOVÁ PONUKA</h1><p>${esc(sub)}</p></div></div>`; }
 
@@ -1137,10 +1145,10 @@ function buildPages(){
     const L=lines(s.benefits), R=lines(s.benefits2);
     if(!L.length && !s.box && !R.length) return "";
     return `<div class="benRow">
-      <div class="greybox gbList">${L.length?`<ul class="sepList">${L.map(b=>`<li>${rt(b)}</li>`).join("")}</ul>`:""}</div>
-      <div class="benRight">${s.box&&s.box.trim()?`<div class="blueBox">${rt(s.box)}</div>`:""}
-        ${R.length?`<ul class="dotList">${R.map(b=>`<li>${rt(b)}</li>`).join("")}</ul>`:""}
-        ${s.tagline&&s.tagline.trim()?`<div class="tagline">${rt(s.tagline)}</div>`:""}</div></div>`;
+      <div class="greybox gbList">${L.length?`<ul class="sepList">${liHTML(s.benefits)}</ul>`:""}</div>
+      <div class="benRight">${s.box&&s.box.trim()?`<div class="blueBox">${rtp(s.box)}</div>`:""}
+        ${R.length?`<ul class="dotList">${liHTML(s.benefits2)}</ul>`:""}
+        ${s.tagline&&s.tagline.trim()?`<div class="tagline">${rtp(s.tagline)}</div>`:""}</div></div>`;
   };
   const first=act[0], fd=svcDef(first.key);
   const introPage = `<div class="pg-inner">
@@ -1154,7 +1162,7 @@ function buildPages(){
       </div>
       <img class="photoImg introPhoto" data-src="${fd.photo}" src="${PHOTO_W(fd.photo)}" width="326" height="190" style="width:326px;height:190px" alt="">
     </div>
-    ${first.intro.trim()?`<p class="introTxt" data-anchor="texts-${first.key}">${rt(first.intro)}</p>`:`<span data-anchor="texts-${first.key}"></span>`}
+    ${first.intro.trim()?`<p class="introTxt" data-anchor="texts-${first.key}">${rtp(first.intro)}</p>`:`<span data-anchor="texts-${first.key}"></span>`}
     <div class="h2doc big">HLAVNÉ PRÍNOSY SPOLUPRÁCE</div>
     ${benHTML(first)}
   </div>
@@ -1170,7 +1178,7 @@ function buildPages(){
     const unitHdr = rows.every(r=>r.unit==="1000 ks")? "Cena za 1000 ks" : rows.every(r=>r.unit==="ks")? "Cena / ks" : "Cena / j.";
     const blocks=[], ph=PHOTO(d.photo);
     if(s!==first){
-      if(s.intro.trim()) blocks.push(`<p class="block introTxt" data-anchor="texts-${s.key}" style="margin-top:0">${rt(s.intro)}</p>`);
+      if(s.intro.trim()) blocks.push(`<p class="block introTxt" data-anchor="texts-${s.key}" style="margin-top:0">${rtp(s.intro)}</p>`);
       const bh=benHTML(s); if(bh) blocks.push(`<div class="block" data-anchor="texts-${s.key}"><div class="h2doc big">HLAVNÉ PRÍNOSY SPOLUPRÁCE</div>${bh}</div>`);
     }
     const MOD = (Q.pageLayout||"klasicke")==="moderne";
@@ -1189,14 +1197,14 @@ function buildPages(){
         <div class="tblWrap ts-${Q.tableStyle||"minimal"}"><table class="prices"><thead><tr>${C.map(c=>`<th class="${c.cls.includes("n")?"n":""}">${c.h}</th>`).join("")}</tr></thead><tbody>
         ${rows.map(r=>`<tr>${C.map(c=>`<td class="${c.cls}">${c.v(r)}</td>`).join("")}</tr>`).join("")}
         ${sumRow&&!isNaN(tot)&&!MOD? (anyTotal? `<tr class="tot"><td colspan="${totIdx}">Spolu bez DPH</td><td class="n">${fmtSum(tot)}</td>${C.slice(totIdx+1).map(()=>"<td></td>").join("")}</tr>` : `<tr class="tot"><td colspan="${C.length-1}">Spolu bez DPH</td><td class="n">${fmtSum(tot)}</td></tr>`) :""}
-        </tbody></table></div>${MOD&&sumRow&&!isNaN(tot)?`<div class="totCard"><span>Spolu bez DPH</span><b>${fmtSum(tot)}</b></div>`:""}${s.note&&s.note.trim()?`<div class="note">${esc(s.note)}</div>`:""}</div>`);
+        </tbody></table></div>${MOD&&sumRow&&!isNaN(tot)?`<div class="totCard"><span>Spolu bez DPH</span><b>${fmtSum(tot)}</b></div>`:""}${s.note&&s.note.trim()?`<div class="note">${rtp(s.note)}</div>`:""}</div>`);
     }
     if(cond.length && MOD) blocks.push(`<div class="block condBlock condModern" data-anchor="cond-${s.key}">
         <img class="photoImg" src="${PHOTO_S(d.photo)}" width="170" height="134" style="width:170px;height:134px" alt="">
-        <div><div class="condTtl">Obchodné podmienky</div><ul class="doc small">${cond.map(b=>`<li>${rt(b)}</li>`).join("")}</ul></div></div>`);
+        <div><div class="condTtl">Obchodné podmienky</div><ul class="doc small">${liHTML(s.conditions)}</ul></div></div>`);
     else if(cond.length) blocks.push(`<div class="block condBlock" data-anchor="cond-${s.key}" style="display:grid; grid-template-columns:190px 1fr; gap:22px; align-items:start">
         <img class="photoImg" src="${PHOTO_S(d.photo)}" width="190" height="150" style="width:190px;height:150px" alt="">
-        <div><span class="pill wide">OBCHODNÉ PODMIENKY</span><ul class="doc small">${cond.map(b=>`<li>${rt(b)}</li>`).join("")}</ul></div></div>`);
+        <div><span class="pill wide">OBCHODNÉ PODMIENKY</span><ul class="doc small">${liHTML(s.conditions)}</ul></div></div>`);
     return {sub:svcTitle(s), blocks};
   });
 
@@ -1207,7 +1215,9 @@ function buildPages(){
   fin.push(`<div class="block"><span class="pill" style="width:300px; text-align:center">REFERENCIE</span>
       <p style="margin:0 0 12px">Spoločnosť Cromwell a. s. dlhodobo zabezpečuje ${act.some(s=>s.key==="ts"||s.key==="tl")&&!act.some(s=>s.key==="hp"||s.key==="nd")?"tlačové a kompletizačné služby":"poštové, tlačové a doručovacie služby"} nielen pre týchto významných klientov:</p>
       <img class="refImg" src="${IMG_REFS[svcDef(act[0].key).refs]}" alt=""></div>`);
-  fin.push(`<div class="closingTxt block">${cl.map((l,i)=>`<p style="margin:0 0 9px; ${i===0||i===cl.length-1?"font-weight:600":""}">${rt(l)}</p>`).join("")}</div>`);
+  { const raw=String(Q.closing||"").replace(/\r/g,"").split("\n").map(x=>x.trim()); while(raw.length&&!raw[0]) raw.shift(); while(raw.length&&!raw[raw.length-1]) raw.pop();
+    const nz=raw.map((x,i)=>x?i:-1).filter(i=>i>=0), f0=nz[0], fN=nz[nz.length-1];
+    fin.push(`<div class="closingTxt block">${raw.map((l,i)=> l? `<p style="margin:0 0 9px; ${i===f0||i===fN?"font-weight:600":""}">${rtp(l)}</p>` : `<div class="clGap"></div>`).join("")}</div>`); }
   fin.push(`<div class="sig block">
       <div class="sigWho"><b>${esc(fullName(P)||"Meno a priezvisko")}</b>${esc(P.position||"")}${P.phone?"<br>M: "+esc(P.phone):""}${P.email?"<br>"+esc(P.email):""}</div>
       <div class="addr sigAddr"><b style="color:#3552CC">${esc(P.company)}</b><br>${esc(P.address).replace(/,\s*/,"<br>")}</div></div>`);
@@ -1346,7 +1356,7 @@ function buildInvoice(){
       ${[["Dátum vystavenia",fmtDateShort(I.issued)],["Dátum splatnosti",fmtDateShort(I.due)],["Spôsob úhrady",I.pay],["Variabilný symbol",qnum.replace(/\D/g,"")],["Materiál",I.material],["Blok",I.block],["Obchodník",fullName(P)],["Cenová ponuka",qnum]]
         .filter(x=>x[1]).map(([k,v])=>`<div><span>${k}</span><b>${esc(v)}</b></div>`).join("")}
     </div>
-    <p class="iText">${rt(text)}</p>
+    <p class="iText">${rtp(text)}</p>
     <div class="tblWrap ts-karta"><table class="prices iTbl"><thead><tr><th>Položka</th><th class="n">Množstvo</th><th class="n">Cena / j.</th><th class="n">Bez DPH spolu</th><th class="n">Záloha</th><th class="n">Záloha bez DPH</th><th class="n">Záloha s DPH</th></tr></thead>
       <tbody>${tr||`<tr><td colspan="7" style="color:#8A90A6">V ponuke zatiaľ nie sú položky s vyplneným množstvom a cenou.</td></tr>`}</tbody></table></div>
     <div class="iTot">
