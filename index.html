@@ -999,7 +999,7 @@ function renderForm(){
   { const I=Q.inv; h += `<div class="card invCard" data-sec="inv"><h3>Zálohová faktúra <small>z tejto ponuky</small></h3><div class="body">
     <p class="hint" style="margin:0 0 10px">Faktúra preberá klienta, položky a ceny z ponuky. Riadky sa do nej dostanú len tie, ktoré majú vyplnené množstvo a cenu.</p>
     <div class="grid2">${field("Materiál","inv.material",{ph:"napr. leták Ľudovít Ondra"})}${field("Blok","inv.block",{ph:"napr. 2642A"})}</div>
-    ${field("Termín distribúcie / realizácie","inv.term",{ph:"napr. 12. – 13. 10. 2026"})}
+    ${field("Termín distribúcie (termín doručovania)","inv.term",{ph:"napr. 12. – 13. 10. 2026 alebo 42. týždeň"})}
     <div class="grid2">${field("Dátum vystavenia","inv.issued",{type:"date"})}${field("Dátum splatnosti","inv.due",{type:"date"})}</div>
     <div class="grid2">${field("Záloha (%)","inv.pct")}${field("DPH (%)","inv.vat")}</div>
     ${field("Spôsob úhrady","inv.pay")}
@@ -1353,7 +1353,7 @@ function buildInvoice(){
         <div class="ikv">${kv("IČO",c.ico)}${kv("DIČ",c.dic)}${kv("IČ DPH",c.icdph)}${kv("Kontakt",c.person)}</div></div>
     </div>
     <div class="iMeta">
-      ${[["Dátum vystavenia",fmtDateShort(I.issued)],["Dátum splatnosti",fmtDateShort(I.due)],["Spôsob úhrady",I.pay],["Variabilný symbol",qnum.replace(/\D/g,"")],["Materiál",I.material],["Blok",I.block],["Obchodník",fullName(P)],["Cenová ponuka",qnum]]
+      ${[["Dátum vystavenia",fmtDateShort(I.issued)],["Dátum splatnosti",fmtDateShort(I.due)],["Termín distribúcie",I.term],["Spôsob úhrady",I.pay],["Variabilný symbol",qnum.replace(/\D/g,"")],["Materiál",I.material],["Blok",I.block],["Obchodník",fullName(P)],["Cenová ponuka",qnum]]
         .filter(x=>x[1]).map(([k,v])=>`<div><span>${k}</span><b>${esc(v)}</b></div>`).join("")}
     </div>
     <p class="iText">${rtp(text)}</p>
