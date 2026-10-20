@@ -575,6 +575,27 @@ table.prices:not(.iTbl) thead th:first-child{width:46%}
 .cenyHead{display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:10px}
 .cenyHead .pill{margin:0}
 .cenyHead .meta{font-size:9.5px; color:#7A8199; letter-spacing:.3px; white-space:nowrap}
+
+/* podpisy štatutárov */
+.statList{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px}
+.statItem{display:flex; gap:8px; align-items:flex-start; border:1.5px solid var(--line); border-radius:10px; padding:9px 10px; cursor:pointer; font-size:12.5px}
+.statItem input{margin-top:2px; accent-color:var(--blue)}
+.statItem span{display:flex; flex-direction:column; line-height:1.3}
+.statItem small{color:var(--muted); font-size:11px}
+.statItem.on{border-color:var(--blue); background:var(--blue-soft)}
+.statItem.dis{opacity:.45; cursor:not-allowed}
+.finBody.withSig{justify-content:flex-start!important; gap:24px}
+.finBody.withSig .statBlock{margin-top:auto!important}
+.statBlock{padding-top:14px; border-top:1.5px solid #3552CC}
+.statLbl{font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.9px; color:#3552CC; margin-bottom:6px}
+.statTxt{font-size:11px; line-height:1.5; margin:0 0 8px; color:#141828}
+.statPlace{font-size:10.5px; color:#4A5068; margin-bottom:34px}
+.statSigs{display:grid; grid-template-columns:1fr 1fr; gap:60px}
+.statSig{display:flex; flex-direction:column; font-size:11px; line-height:1.45}
+.statLine{border-top:1px solid #141828; margin-bottom:6px}
+.statSig b{font-weight:600; color:#141828}
+.statSig span{color:#6B7390; font-size:10px}
+.page.ft2 .statPlace,.page.ft3 .statPlace{margin-bottom:24px}
 </style>
 </head>
 <body>
@@ -914,11 +935,20 @@ function newQuote(keys=["hp"]){
       intro:s.intro, benefits:s.benefits.join("\n"), box:s.box, benefits2:s.benefits2.join("\n"), tagline:s.tagline, spec:clone(s.spec), rows:clone(s.rows),
       conditions:s.conditions.join("\n"), note:s.note, showNote:!!s.note, showBenefits:true})),
     closing:CLOSING,
-    inv:blankInv()
+    inv:blankInv(),
+    stat:{on:false, ids:[], text:""}
   };
 }
 function blankInv(){ const d=new Date(); d.setDate(d.getDate()+7); return {pct:"100", vat:"23", issued:todayISO(), due:d.toISOString().slice(0,10), pay:"prevodom", material:"", block:"", term:"", text:""}; }
 const svcDef = k => SERVICES.find(s=>s.key===k);
+/* štatutárni zástupcovia Cromwell a.s. – do ponuky sa vyberajú najviac dvaja */
+const STATUTARI=[
+  {id:"mynar",    name:"Slávek Mynář",             role:"Predseda predstavenstva"},
+  {id:"slaninka", name:"Ing. Juraj Slaninka",      role:"Podpredseda predstavenstva"},
+  {id:"durana",   name:"Peter Ďurana",             role:"Člen predstavenstva"},
+  {id:"nikolini", name:"JUDr. Branislav Nikolíni", role:"Člen predstavenstva"}
+];
+const STAT_TEXT="Obsah a podmienky tejto cenovej ponuky potvrdzujú za spoločnosť Cromwell a.s. jej štatutárni zástupcovia.";
 const activeSvcs = () => Q.services.filter(s=>s.on);
 
 /* ════════════════ čísla ════════════════ */
@@ -1058,7 +1088,14 @@ function renderForm(){
   </div></div>`; }
   h += `<div class="card"><h3>Rozloženie strany s cenami</h3><div class="body"><div class="tiles">${[["klasicke","Klasické"],["moderne","Moderné"]].map(([v,l])=>`<button class="tile ${(Q.pageLayout||"klasicke")===v?"on":""}" data-layout="${v}"><span class="box"></span>${l}</button>`).join("")}</div></div></div>`;
   h += `<div class="card"><h3>Štýl tabuliek cien</h3><div class="body"><div class="tiles three">${TSTYLES.map(([v,l])=>`<button class="tile ${(Q.tableStyle||"minimal")===v?"on":""}" data-tstyle="${v}"><span class="box"></span>${l}</button>`).join("")}</div></div></div>`;
-  h += `<div class="card" data-sec="closing"><h3>Záver ponuky</h3><div class="body">${field("Text záveru","closing",{area:1,rows:5})}</div></div>`;
+  { const St=Q.stat||{on:false,ids:[]}; const full=(St.ids||[]).length>=2;
+  h += `<div class="card" data-sec="closing"><h3>Záver ponuky</h3><div class="body">${field("Text záveru","closing",{area:1,rows:5})}
+    <div class="sub">Podpisy štatutárov</div>
+    <label class="totTog"><input type="checkbox" data-staton="1" ${St.on?"checked":""}> Pridať na koniec ponuky podpisy štatutárnych zástupcov</label>
+    ${St.on?`<p class="hint" style="margin:8px 0 6px">Vyberte dvoch štatutárov, ktorí ponuku podpíšu:</p>
+      <div class="statList">${STATUTARI.map(p=>{ const on=(St.ids||[]).includes(p.id); return `<label class="statItem ${on?"on":""} ${!on&&full?"dis":""}"><input type="checkbox" data-statid="${p.id}" ${on?"checked":""} ${!on&&full?"disabled":""}><span><b>${esc(p.name)}</b><small>${esc(p.role)}</small></span></label>`; }).join("")}</div>
+      ${field("Text nad podpismi (nechajte prázdne pre predvolený text)","stat.text",{area:1,rows:2,ph:STAT_TEXT})}`:""}
+  </div></div>`; }
   f.innerHTML = h;
   f.scrollTop = scroll;
   if(focP){ const el=f.querySelector(`[data-p="${focP}"]`); if(el){ el.focus({preventScroll:true}); try{ const n=el.value.length; el.setSelectionRange(n,n); }catch(e){} } }
@@ -1095,7 +1132,7 @@ $("#form").addEventListener("input", e=>{
   }
   schedulePreview();
 });
-$("#form").addEventListener("change", e=>{ { const m=(e.target.dataset.p||"").match(/^services\.(\d+)\.rows\.\d+\.qty$/); if(m){ if(checkFee(Q.services[+m[1]])) setTimeout(()=>{ renderForm(); renderPreview(); },0); return; } } if((e.target.dataset.p||"").startsWith("inv.")){ renderPreview(); } if(e.target.dataset.colposset){ const [i,k]=e.target.dataset.colposset.split(".").map(Number); Q.services[i].colPos[k]=e.target.value; dirty=true; renderPreview(); return; } if(e.target.dataset.rowpos!=null||e.target.dataset.colpos!=null||e.target.dataset.specpos!=null) return; if(e.target.dataset.tottog!=null){ Q.services[+e.target.dataset.tottog].showTotal=e.target.checked; dirty=true; renderPreview(); return; } if(e.target.dataset.vattog!=null){ Q.services[+e.target.dataset.vattog].showVatNote=e.target.checked; dirty=true; renderPreview(); return; } if(e.target.dataset.sumtog!=null){ Q.services[+e.target.dataset.sumtog].showSumRow=e.target.checked; dirty=true; renderPreview(); return; } if(/\.cols\./.test(e.target.dataset.p||"")){ renderAll(); return; } if(e.target.tagName==="SELECT"){ set(e.target.dataset.p,e.target.value); const m=(e.target.dataset.p||"").match(/^services\.(\d+)\.rows\.(\d+)\.unit$/); if(m) derive(Q.services[+m[1]].rows[+m[2]]); dirty=true; renderAll(); } });
+$("#form").addEventListener("change", e=>{ { const m=(e.target.dataset.p||"").match(/^services\.(\d+)\.rows\.\d+\.qty$/); if(m){ if(checkFee(Q.services[+m[1]])) setTimeout(()=>{ renderForm(); renderPreview(); },0); return; } } if((e.target.dataset.p||"").startsWith("inv.")){ renderPreview(); } if(e.target.dataset.colposset){ const [i,k]=e.target.dataset.colposset.split(".").map(Number); Q.services[i].colPos[k]=e.target.value; dirty=true; renderPreview(); return; } if(e.target.dataset.rowpos!=null||e.target.dataset.colpos!=null||e.target.dataset.specpos!=null) return; if(e.target.dataset.tottog!=null){ Q.services[+e.target.dataset.tottog].showTotal=e.target.checked; dirty=true; renderPreview(); return; } if(e.target.dataset.staton!=null){ Q.stat.on=e.target.checked; dirty=true; renderAll(); return; } if(e.target.dataset.statid!=null){ const id=e.target.dataset.statid, a=Q.stat.ids||(Q.stat.ids=[]); if(e.target.checked){ if(!a.includes(id) && a.length<2) a.push(id); } else Q.stat.ids=a.filter(x=>x!==id); dirty=true; renderAll(); return; } if(e.target.dataset.vattog!=null){ Q.services[+e.target.dataset.vattog].showVatNote=e.target.checked; dirty=true; renderPreview(); return; } if(e.target.dataset.sumtog!=null){ Q.services[+e.target.dataset.sumtog].showSumRow=e.target.checked; dirty=true; renderPreview(); return; } if(/\.cols\./.test(e.target.dataset.p||"")){ renderAll(); return; } if(e.target.tagName==="SELECT"){ set(e.target.dataset.p,e.target.value); const m=(e.target.dataset.p||"").match(/^services\.(\d+)\.rows\.(\d+)\.unit$/); if(m) derive(Q.services[+m[1]].rows[+m[2]]); dirty=true; renderAll(); } });
 $("#form").addEventListener("click", e=>{
   const t=e.target.closest("[data-tog],[data-fold],[data-addrow],[data-delrow],[data-addspec],[data-delspec],[data-go],[data-addon],[data-addcol],[data-delcol],[data-tstyle],[data-mvspec],[data-layout],[data-invshow],[data-invpdf],[data-objshow],[data-objpdf],[data-addtable],[data-invedit],[data-invreset],[data-invadd],[data-invdel]"); if(!t) return;
   e.preventDefault();
@@ -1273,6 +1310,13 @@ function buildPages(){
   fin.push(`<div class="sig block">
       <div class="sigWho"><b>${esc(fullName(P)||"Meno a priezvisko")}</b>${esc(P.position||"")}${P.phone?"<br>M: "+esc(P.phone):""}${P.email?"<br>"+esc(P.email):""}</div>
       <div class="addr sigAddr"><b style="color:#3552CC">${esc(P.company)}</b><br>${esc(P.address).replace(/,\s*/,"<br>")}</div></div>`);
+  { const St=Q.stat||{}; const sel=(St.ids||[]).map(id=>STATUTARI.find(p=>p.id===id)).filter(Boolean);
+    if(St.on && sel.length) fin.push(`<div class="statBlock block">
+      <div class="statLbl">Za spoločnosť ${esc(P.company||"Cromwell a.s.")}</div>
+      <p class="statTxt">${rtp((St.text&&St.text.trim())?St.text:STAT_TEXT)}</p>
+      <div class="statPlace">V ${esc(P.city||"Bratislave")}, dňa ...................................</div>
+      <div class="statSigs">${sel.map(p=>`<div class="statSig"><div class="statLine"></div><b>${esc(p.name)}</b><span>${esc(p.role)}</span></div>`).join("")}</div>
+    </div>`); }
   // záver ide na koniec poslednej služby, ak sa zmestí; inak na novú stranu
   sections.push({sub:subtitle, blocks:fin, final:true});
 
@@ -1314,7 +1358,7 @@ function buildPages(){
   const total=pages.length+2;
   const foot=n=>`<div class="pg-foot">${esc(P.company||"Cromwell a.s.")} · ${esc(qnum)}</div><div class="pg-num">${n} / ${total}</div>`;
   return `<div class="page cover" data-anchor="cover">${cover}</div><div class="page intro" data-anchor="client">${introPage}</div>` +
-    pages.map((pg,i)=>`<div class="page ${pg.cls||""}" ${pg.final?'data-anchor="closing"':""}><div class="pg-inner${pg.final?" finInner":""}">${pageHeader(pg.sub)}${pg.final?`<div class="finBody">${pg.html.join("")}</div>`:pg.html.join("")}</div>${pg.bottom?`<div class="pgBottom">${pg.bottom}</div>`:""}${foot(i+3)}</div>`).join("");
+    pages.map((pg,i)=>`<div class="page ${pg.cls||""}" ${pg.final?'data-anchor="closing"':""}><div class="pg-inner${pg.final?" finInner":""}">${pageHeader(pg.sub)}${pg.final?`<div class="finBody ${(Q.stat&&Q.stat.on&&(Q.stat.ids||[]).length)?"withSig":""}">${pg.html.join("")}</div>`:pg.html.join("")}</div>${pg.bottom?`<div class="pgBottom">${pg.bottom}</div>`:""}${foot(i+3)}</div>`).join("");
 }
 
 /* fotka na 2. strane: výška = výška bloku OD/PRE (orez "cover" cez canvas, aby PDF sedelo) */
@@ -1519,7 +1563,7 @@ $("#qList").addEventListener("click", async e=>{
   if(b.dataset.copy){ const src=clone(find(b.dataset.copy)); Object.assign(src,{id:newQuote().id, number:null, saved:false, date:todayISO()}); src.client={name:"",address:"",person:"",position:"",phone:"",email:""}; src.inv=blankInv(); Q=migrate(src); dirty=true; show("editor"); toast("Kópia pripravená — doplňte klienta."); }
   if(b.dataset.del){ if(!confirm("Naozaj zmazať ponuku "+find(b.dataset.del).number+"?")) return; await Store.deleteQuote(b.dataset.del); renderList(); }
 });
-function migrate(q){ q.inv=Object.assign(blankInv(), q.inv||{}); // doplní služby pridané neskôr do konfigurácie
+function migrate(q){ q.inv=Object.assign(blankInv(), q.inv||{}); q.stat=Object.assign({on:false,ids:[],text:""}, q.stat||{}); // doplní služby pridané neskôr do konfigurácie
   SERVICES.forEach(s=>{ if(!q.services.find(x=>x.key===s.key)){ const n=newQuote().services.find(x=>x.key===s.key); n.on=false; q.services.push(n); } });
   q.services.forEach(x=>{ const d=svcDef(x.key); if(x.box===undefined){ x.box=d.box; x.benefits2=d.benefits2.join("\n"); x.tagline=d.tagline; } });
   q.services.sort((a,b)=>SERVICES.findIndex(s=>s.key===a.key)-SERVICES.findIndex(s=>s.key===b.key));
