@@ -547,6 +547,19 @@ textarea.nameCell.open{grid-column:1 / -1; white-space:pre-wrap; overflow:hidden
 li.gapB{margin-top:12px!important}
 ul.sepList li.gapB{margin-top:14px!important}
 .clGap{height:10px}
+
+.priceRow .rm{width:16px; padding:0; border:0; background:transparent; color:var(--muted); font-size:15px; font-weight:700; border-radius:6px; height:30px; line-height:1}
+.priceRow .rm:hover{background:var(--bg); color:var(--blue)}
+.rowMenu{position:fixed; z-index:60; min-width:230px; max-width:300px; background:var(--panel); color:var(--ink); border:1px solid var(--line); border-radius:12px; box-shadow:0 12px 32px rgba(20,30,80,.18); padding:6px; font-size:13px}
+.rowMenu .rmHead{font-size:10.5px; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); font-weight:600; padding:8px 10px 4px}
+.rowMenu button{display:block; width:100%; text-align:left; border:0; background:transparent; padding:7px 10px; border-radius:8px; font-size:13px; color:var(--ink)}
+.rowMenu button:hover:not(:disabled){background:var(--blue-soft); color:var(--blue)}
+.rowMenu button:disabled{opacity:.35; cursor:default}
+.rowMenu .rmNote{font-size:12px; color:var(--muted); padding:4px 10px 8px; line-height:1.4}
+@media print{ .rowMenu{display:none!important} }
+
+.navSep{width:1px; align-self:stretch; margin:4px 2px; background:var(--line)}
+@media (max-width:980px){ .navSep{display:none} .nav button{font-size:12px; padding:7px 4px} }
 </style>
 </head>
 <body>
@@ -554,7 +567,10 @@ ul.sepList li.gapB{margin-top:14px!important}
   <header class="top">
     <div class="logo"><div class="mark">Cromwell</div> Cenové ponuky <span id="storeMode"></span></div>
     <nav class="nav" aria-label="Sekcie">
-      <button data-view="editor" class="on">Ponuka</button>
+      <button data-view="editor" data-pv="quote" class="on">Ponuka</button>
+      <button data-view="editor" data-pv="inv" title="Interný podklad pre ekonomické oddelenie – nejde o ostrú faktúru.">Zálohová FA</button>
+      <button data-view="editor" data-pv="obj">Objednávka</button>
+      <span class="navSep"></span>
       <button data-view="list">Moje ponuky</button>
       <button data-view="profile">Môj profil</button>
     </nav>
@@ -568,7 +584,7 @@ ul.sepList li.gapB{margin-top:14px!important}
       <div class="editor" id="editor">
         <div class="form" id="form"></div>
         <div class="resizer" id="resizer" title="Potiahnutím zmeníte šírku panela · dvojklik = pôvodná šírka"></div>
-        <div class="previewWrap" id="previewWrap"><div class="pvTabs" id="pvTabs"><button class="on" data-pv="quote">Cenová ponuka</button><button data-pv="inv" title="Interný podklad pre ekonomické oddelenie – nejde o ostrú faktúru.">Zálohová FA</button></div><div class="pages" id="pages"></div></div>
+        <div class="previewWrap" id="previewWrap"><div class="pages" id="pages"></div></div>
       </div>
       <div class="bar">
         <button class="btn" id="bNew" title="Začať novú ponuku">Nová</button>
@@ -963,7 +979,7 @@ function renderForm(){
 
       <div class="sub" data-sec="prices-${s.key}">Ceny</div>
       ${s.cols.length?`<div class="colsEd">${s.cols.map((c,k)=>`<div class="colChip"><input class="cell" data-p="services.${i}.cols.${k}" value="${esc(c)}" placeholder="Názov stĺpca"><select class="cell posSel" data-colposset="${i}.${k}" title="Umiestnenie v PDF">${COLPOS.map(([v,l])=>`<option value="${v}" ${(s.colPos[k]||"name")===v?"selected":""}>${l}</option>`).join("")}</select><button class="x" data-delcol="${i}.${k}" aria-label="Odstrániť stĺpec">×</button></div>`).join("")}</div>`:""}
-      <div class="priceRow priceHead" style="${gridCols(s)}"><span>Položka</span>${s.cols.map(c=>`<span>${esc(c||"Stĺpec")}</span>`).join("")}<span>Množstvo</span><span>Jednotka</span><span>Cena / j.</span><span>Spolu</span><span></span></div>
+      <div class="priceRow priceHead" style="${gridCols(s)}"><span>Položka</span>${s.cols.map(c=>`<span>${esc(c||"Stĺpec")}</span>`).join("")}<span>Množstvo</span><span>Jednotka</span><span>Cena / j.</span><span>Spolu</span><span></span><span></span></div>
       ${s.rows.map((r,j)=>`<div class="priceRow" style="${gridCols(s)}">
         <textarea class="cell nameCell ${r.fee?"feeCell":""}" data-p="services.${i}.rows.${j}.name" rows="1" wrap="off" placeholder="Názov položky" title="${esc(r.fee?"Pridané automaticky – náklad je nižší ako 5 000 ks. Krížikom ho môžete odstrániť.\n"+r.name:r.name)}">${esc(r.name)}</textarea>
         ${s.cols.map((c,k)=>`<input class="cell" data-p="services.${i}.rows.${j}.x.${k}" value="${esc(r.x[k]||"")}">`).join("")}
@@ -971,7 +987,7 @@ function renderForm(){
         <select class="cell unitSel" data-p="services.${i}.rows.${j}.unit">${["ks","1000 ks"].map(u=>`<option ${u===r.unit?"selected":""}>${u}</option>`).join("")}</select>
         <input class="cell" data-p="services.${i}.rows.${j}.price" value="${esc(r.price)}" placeholder="0,000" inputmode="decimal">
         <input class="cell sumCell" data-p="services.${i}.rows.${j}.sum" value="${esc(r.mode==="total"? (r.sum||"") : fmtIn(rowTotal(r),2))}" placeholder="spolu" inputmode="decimal" title="Cena spolu – ak ju zadáte, cena za jednotku sa dopočíta">
-        <button class="x" data-delrow="${i}.${j}" aria-label="Odstrániť riadok">×</button></div>`).join("")}
+        <button class="rm" data-rowmenu="${i}.${j}" aria-label="Možnosti riadka" title="Posunúť riadok alebo presunúť do inej služby">⋮</button><button class="x" data-delrow="${i}.${j}" aria-label="Odstrániť riadok">×</button></div>`).join("")}
       <div class="addGrid">
         <div class="addWith"><button class="add" data-addrow="${i}">+ Pridať riadok</button>
           <select class="cell" data-rowpos="${i}" title="Kam vložiť nový riadok"><option value="end">na koniec</option><option value="-1">na začiatok</option>${s.rows.map((r,j)=>`<option value="${j}">za ${j+1}. ${esc((r.name||"riadok").slice(0,22))}</option>`).join("")}</select></div>
@@ -996,7 +1012,7 @@ function renderForm(){
     </div></div>`;
   });
 
-  { const I=Q.inv; h += `<div class="card invCard" data-sec="inv"><h3>Zálohová faktúra <small>z tejto ponuky</small></h3><div class="body">
+  { const I=Q.inv; h += `<div class="card invCard" data-sec="inv"><h3>Zálohová FA a objednávka <small>z tejto ponuky</small></h3><div class="body">
     <p class="hint" style="margin:0 0 10px">Faktúra preberá klienta, položky a ceny z ponuky. Riadky sa do nej dostanú len tie, ktoré majú vyplnené množstvo a cenu.</p>
     <div class="grid2">${field("Materiál","inv.material",{ph:"napr. leták Ľudovít Ondra"})}${field("Blok","inv.block",{ph:"napr. 2642A"})}</div>
     ${field("Termín distribúcie (termín doručovania)","inv.term",{ph:"napr. 12. – 13. 10. 2026 alebo 42. týždeň"})}
@@ -1004,6 +1020,7 @@ function renderForm(){
     <div class="grid2">${field("Záloha (%)","inv.pct")}${field("DPH (%)","inv.vat")}</div>
     ${field("Spôsob úhrady","inv.pay")}
     ${field("Text faktúry (nechajte prázdne pre automatický text)","inv.text",{area:1,rows:3,ph:invAutoText()})}
+    ${field("Text objednávky (nechajte prázdne pre automatický text)","inv.textObj",{area:1,rows:3,ph:objAutoText()})}
     <div class="sub">Položky faktúry</div>
     ${Array.isArray(I.rows) ? `
       <div class="invRow invHead"><span>Položka</span><span>Množstvo</span><span>Jednotka</span><span>Cena / j.</span><span>Spolu</span><span></span></div>
@@ -1020,6 +1037,7 @@ function renderForm(){
       <button class="add" data-invedit="1" style="margin-bottom:10px">✎ Upraviť položky faktúry</button>`}
     ${!profile.iban?`<div class="warnBox" style="margin:4px 0 10px">Na faktúre chýba IBAN dodávateľa – doplňte ho raz v <a href="#" data-go="profile">profile</a>.</div>`:""}
     <div class="grid2"><button class="btn" data-invshow="1" title="Interný podklad pre ekonomické oddelenie – nejde o ostrú faktúru.">Náhľad zálohovej FA</button><button class="btn primary" data-invpdf="1" title="Interný podklad pre ekonomické oddelenie – nejde o ostrú faktúru.">Zálohová FA</button></div>
+    <div class="grid2" style="margin-top:8px"><button class="btn" data-objshow="1">Náhľad objednávky</button><button class="btn primary" data-objpdf="1">Objednávka</button></div>
   </div></div>`; }
   h += `<div class="card"><h3>Rozloženie strany s cenami</h3><div class="body"><div class="tiles">${[["klasicke","Klasické"],["moderne","Moderné"]].map(([v,l])=>`<button class="tile ${(Q.pageLayout||"klasicke")===v?"on":""}" data-layout="${v}"><span class="box"></span>${l}</button>`).join("")}</div></div></div>`;
   h += `<div class="card"><h3>Štýl tabuliek cien</h3><div class="body"><div class="tiles three">${TSTYLES.map(([v,l])=>`<button class="tile ${(Q.tableStyle||"minimal")===v?"on":""}" data-tstyle="${v}"><span class="box"></span>${l}</button>`).join("")}</div></div></div>`;
@@ -1031,7 +1049,7 @@ function renderForm(){
 const TSTYLES=[["karta","Karta"],["modra","Modrá hlavička"],["minimal","Minimal"]];
 const COLPOS=[["name","za Položkou"],["qty","za Množstvom"],["price","za Cenou / j."],["total","na koniec"]];
 function normCols(s){ if(s.showSumRow===undefined) s.showSumRow = s.showTotal!==false; s.cols=s.cols||[]; s.colPos=s.colPos||[]; while(s.colPos.length<s.cols.length) s.colPos.push("name"); s.rows.forEach(r=>{ r.x=r.x||[]; while(r.x.length<s.cols.length) r.x.push(""); }); }
-function gridCols(s){ return "grid-template-columns:minmax(90px,1fr) "+s.cols.map(()=>"54px ").join("")+"52px 56px 52px 64px 18px"; }
+function gridCols(s){ return "grid-template-columns:minmax(90px,1fr) "+s.cols.map(()=>"54px ").join("")+"52px 56px 52px 64px 16px 18px"; }
 function specWide(spec){ // dlhé hodnoty cez celú šírku, osamotená krátka dlaždica sa roztiahne
   const W=spec.map(r=>((r[0]||"")+(r[1]||"")).length>62); const out=[]; let col=0;
   spec.forEach((r,i)=>{ let w=W[i]; if(!w && col===0 && (i===spec.length-1 || W[i+1])) w=true; out.push([r,w]); col = w?0:(col+1)%2; });
@@ -1062,7 +1080,7 @@ $("#form").addEventListener("input", e=>{
 });
 $("#form").addEventListener("change", e=>{ { const m=(e.target.dataset.p||"").match(/^services\.(\d+)\.rows\.\d+\.qty$/); if(m){ if(checkFee(Q.services[+m[1]])) setTimeout(()=>{ renderForm(); renderPreview(); },0); return; } } if((e.target.dataset.p||"").startsWith("inv.")){ renderPreview(); } if(e.target.dataset.colposset){ const [i,k]=e.target.dataset.colposset.split(".").map(Number); Q.services[i].colPos[k]=e.target.value; dirty=true; renderPreview(); return; } if(e.target.dataset.rowpos!=null||e.target.dataset.colpos!=null||e.target.dataset.specpos!=null) return; if(e.target.dataset.tottog!=null){ Q.services[+e.target.dataset.tottog].showTotal=e.target.checked; dirty=true; renderPreview(); return; } if(e.target.dataset.sumtog!=null){ Q.services[+e.target.dataset.sumtog].showSumRow=e.target.checked; dirty=true; renderPreview(); return; } if(/\.cols\./.test(e.target.dataset.p||"")){ renderAll(); return; } if(e.target.tagName==="SELECT"){ set(e.target.dataset.p,e.target.value); const m=(e.target.dataset.p||"").match(/^services\.(\d+)\.rows\.(\d+)\.unit$/); if(m) derive(Q.services[+m[1]].rows[+m[2]]); dirty=true; renderAll(); } });
 $("#form").addEventListener("click", e=>{
-  const t=e.target.closest("[data-tog],[data-fold],[data-addrow],[data-delrow],[data-addspec],[data-delspec],[data-go],[data-addon],[data-addcol],[data-delcol],[data-tstyle],[data-mvspec],[data-layout],[data-invshow],[data-invpdf],[data-invedit],[data-invreset],[data-invadd],[data-invdel]"); if(!t) return;
+  const t=e.target.closest("[data-tog],[data-fold],[data-addrow],[data-delrow],[data-addspec],[data-delspec],[data-go],[data-addon],[data-addcol],[data-delcol],[data-tstyle],[data-mvspec],[data-layout],[data-invshow],[data-invpdf],[data-objshow],[data-objpdf],[data-invedit],[data-invreset],[data-invadd],[data-invdel]"); if(!t) return;
   e.preventDefault();
   if(t.dataset.go){ show(t.dataset.go); return; }
   if(t.dataset.invshow){ setPreviewMode("inv"); return; }
@@ -1071,6 +1089,8 @@ $("#form").addEventListener("click", e=>{
   if(t.dataset.invadd){ Q.inv.rows.push({svc:"", key:"", name:"", qty:"", unit:"ks", price:""}); }
   if(t.dataset.invdel!=null){ Q.inv.rows.splice(+t.dataset.invdel,1); }
   if(t.dataset.invpdf){ setPreviewMode("inv"); makePdf("inv"); return; }
+  if(t.dataset.objshow){ setPreviewMode("obj"); return; }
+  if(t.dataset.objpdf){ setPreviewMode("obj"); makePdf("obj"); return; }
   if(t.dataset.tstyle){ Q.tableStyle=t.dataset.tstyle; }
   if(t.dataset.layout){ Q.pageLayout=t.dataset.layout; if(t.dataset.layout==="moderne") Q.tableStyle="karta"; }
   if(t.dataset.addon){ toggleAddon(...t.dataset.addon.split(".")); }
@@ -1286,11 +1306,11 @@ async function fitIntroPhotos(root){
 let pvT=null;
 function schedulePreview(){ clearTimeout(pvT); pvT=setTimeout(renderPreview,180); }
 let previewMode="quote";
-function setPreviewMode(m){ previewMode=m; document.querySelectorAll("#pvTabs button").forEach(b=>b.classList.toggle("on",b.dataset.pv===m)); $("#pages").style.transform=""; renderPreview();
+function setPreviewMode(m){ previewMode=m; updateNav("editor"); $("#pages").style.transform=""; renderPreview();
   if(innerWidth<=980){ document.querySelectorAll(".mobileSwitch button").forEach(x=>x.classList.toggle("on",x.dataset.m==="preview")); $("#editor").classList.add("showPreview"); } }
 function renderPreview(){
-  const box=$("#pages"); box.innerHTML = previewMode==="inv" ? buildInvoice() : buildPages();
-  fitPreview(); if(previewMode!=="inv") fitIntroPhotos(box);
+  const box=$("#pages"); box.innerHTML = previewMode==="quote" ? buildPages() : buildInvoice(previewMode);
+  fitPreview(); if(previewMode==="quote") fitIntroPhotos(box);
   // kontrola pretečenia
   let over=0;
   box.querySelectorAll(".page").forEach(pg=>{
@@ -1312,6 +1332,11 @@ function renderAll(){ Q.services.forEach(sv=>{ if(sv.on) checkFee(sv); }); rende
 
 
 /* ════════════════ zálohová faktúra ════════════════ */
+function objAutoText(){
+  const I=Q.inv||blankInv(), act=activeSvcs();
+  const sv=act.map(s=>svcDef(s.key).name.toLowerCase()).join(", ").replace(/, ([^,]*)$/," a $1");
+  return `Predmetom objednávky je ${sv||"služby"}${I.material?` – ${I.material}`:""}${I.term?` v termíne ${I.term}`:""} na základe cenovej ponuky č. ${Q.number||nextNumber()}.`;
+}
 function invAutoText(){
   const I=Q.inv||blankInv(), act=activeSvcs();
   const sv=act.map(s=>svcDef(s.key).name.toLowerCase()).join(", ").replace(/, ([^,]*)$/," a $1");
@@ -1330,10 +1355,10 @@ function invRows(){
       out.push({svc:d.name, name:r.name, qty:r.qty, unit:r.unit, price:num(r.price), key:s.key, total:t}); }); });
   return out;
 }
-function buildInvoice(){
+function buildInvoice(kind){ const OBJ = kind==="obj";
   const P=profile, c=Q.client, I=Object.assign(blankInv(), Q.inv||{});
   const pct=(num(I.pct)||0)/100, vat=(num(I.vat)||0)/100;
-  const rows=invRows(), qnum=Q.number||nextNumber(), znum="ZF-"+qnum;
+  const rows=invRows(), qnum=Q.number||nextNumber(), znum=(OBJ?"OBJ-":"ZF-")+qnum;
   const r2=n=>Math.round(n*100)/100;
   let sBase=0, sAdv=0, sVat=0;
   const tr=rows.map(r=>{ const adv=r2(r.total*pct), advV=r2(adv*(1+vat)); sBase+=r.total; sAdv+=adv; sVat+=advV;
@@ -1341,9 +1366,9 @@ function buildInvoice(){
       <td class="n">${isNaN(r.price)?"–":fmtPrice(r.price,r.key)}<div class="iU">${r.unit==="1000 ks"?"za 1000 ks":"za ks"}</div></td>
       <td class="n">${fmtSum(r.total)}</td><td class="n">${esc(I.pct||"100")} %</td><td class="n">${fmtSum(adv)}</td><td class="n b">${fmtSum(advV)}</td></tr>`; }).join("");
   const kv=(k,v)=> v? `<div class="ik"><span>${k}</span><b>${esc(v)}</b></div>`:"";
-  const text=(I.text&&I.text.trim())? I.text : invAutoText();
+  const text = OBJ ? ((I.textObj&&I.textObj.trim())? I.textObj : objAutoText()) : ((I.text&&I.text.trim())? I.text : invAutoText());
   return `<div class="page invPage"><div class="pg-inner">
-    <div class="hdr"><div class="mk"><img src="${IMG_WORDMARK}" alt="Cromwell"></div><div class="ttl"><h1>ZÁLOHOVÁ FAKTÚRA</h1><p>č. ${esc(znum)}</p></div></div>
+    <div class="hdr"><div class="mk"><img src="${IMG_WORDMARK}" alt="Cromwell"></div><div class="ttl"><h1>${OBJ?"OBJEDNÁVKA":"ZÁLOHOVÁ FAKTÚRA"}</h1><p>č. ${esc(znum)}</p></div></div>
     <div class="iParties">
       <div><div class="iLbl">Dodávateľ</div>
         <div class="addr"><b>${esc(P.company)}</b><br>${esc(P.address).replace(/,\s*/,"<br>")}</div>
@@ -1366,19 +1391,19 @@ function buildInvoice(){
     </div>
     <div class="iFoot">
       <div><span class="k">Vystavil</span><b>${esc(fullName(P)||"Meno a priezvisko")}</b>${P.phone?"<br>"+esc(P.phone):""}${P.email?"<br>"+esc(P.email):""}</div>
-      <div class="iNote">Zálohová faktúra nie je daňovým dokladom. Daňový doklad bude vystavený po prijatí platby.</div>
+      <div class="iNote">${OBJ?`Objednávka vychádza z cenovej ponuky č. ${esc(qnum)}.`:"Zálohová faktúra nie je daňovým dokladom. Daňový doklad bude vystavený po prijatí platby."}</div>
     </div>
   </div><div class="pg-foot">${esc(P.company||"Cromwell a.s.")} · ${esc(znum)}</div><div class="pg-num">1 / 1</div></div>`;
 }
 
 /* ════════════════ PDF ════════════════ */
-async function makePdf(mode){ mode = mode==="inv"?"inv":"quote";
+async function makePdf(mode){ mode = (mode==="inv"||mode==="obj")?mode:"quote";
   if(!window.jspdf || !window.html2canvas){ toast("Knižnica pre PDF sa nenačítala. Skontrolujte pripojenie a obnovte stránku."); return; }
   if(renderPreview.over) toast("Pozor: niektorá strana je príliš dlhá (červený rámik). Obsah by sa orezal.",3500);
   const btn=$("#bPdf"); btn.disabled=true; btn.textContent="Pripravujem PDF…";
   try{
     await document.fonts.ready;
-    const html = mode==="inv" ? buildInvoice() : buildPages(); const stage=$("#stage"); stage.innerHTML=html; if(mode!=="inv") await fitIntroPhotos(stage);
+    const html = mode==="quote" ? buildPages() : buildInvoice(mode); const stage=$("#stage"); stage.innerHTML=html; if(mode==="quote") await fitIntroPhotos(stage);
     const pages=[...stage.querySelectorAll(".page")];
     const { jsPDF } = window.jspdf;
     const pdf=new jsPDF({unit:"mm", format:"a4", compress:true});
@@ -1390,7 +1415,7 @@ async function makePdf(mode){ mode = mode==="inv"?"inv":"quote";
     }
     stage.innerHTML="";
     const client=(Q.client.name||"klient").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^\w]+/g,"_").replace(/^_|_$/g,"");
-    const fname=`${mode==="inv"?"ZF":"CP"}_${Q.number||nextNumber()}_${client}.pdf`;
+    const fname=`${mode==="inv"?"ZF":mode==="obj"?"OBJ":"CP"}_${Q.number||nextNumber()}_${client}.pdf`;
     const blob=pdf.output("blob");
     if(Store.downloads){
       try{ await Store.downloads.save({filename:fname, data:blob}); toast("PDF uložené."); }
@@ -1463,15 +1488,17 @@ $("#pSave").addEventListener("click", async ()=>{
 function updateWho(){ $("#whoTop").textContent = fullName(profile) ? fullName(profile)+(profile.position?" · "+profile.position:"") : ""; }
 
 /* ════════════════ navigácia ════════════════ */
+function updateNav(v){ v=v||($("#vEditor").style.display!=="none"?"editor":$("#vList").hidden?"profile":"list");
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("on", b.dataset.view===v && (!b.dataset.pv || b.dataset.pv===previewMode))); }
 function show(v){
-  document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("on",b.dataset.view===v));
+  updateNav(v);
   $("#vEditor").style.display = v==="editor"?"flex":"none";
   $("#vList").hidden = v!=="list"; $("#vProfile").hidden = v!=="profile";
   if(v==="editor") renderAll();
   if(v==="list") renderList();
   if(v==="profile") fillProfileForm();
 }
-document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>show(b.dataset.view)));
+document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>{ if(b.dataset.pv){ previewMode=b.dataset.pv; $("#pages").style.transform=""; } show(b.dataset.view); }));
 document.querySelectorAll(".mobileSwitch button").forEach(b=>b.addEventListener("click",()=>{
   document.querySelectorAll(".mobileSwitch button").forEach(x=>x.classList.toggle("on",x===b));
   $("#editor").classList.toggle("showPreview", b.dataset.m==="preview");
@@ -1489,14 +1516,58 @@ $("#bPrint").addEventListener("click", async ()=>{
 $("#bNew").addEventListener("click",()=>{ if(dirty && !confirm("Neuložené zmeny sa stratia. Začať novú ponuku?")) return; Q=newQuote(); dirty=false; renderAll(); });
 addEventListener("beforeunload", e=>{ if(dirty){ e.preventDefault(); e.returnValue=""; } });
 
+/* ════════════════ menu riadka: poradie a presun medzi službami ════════════════ */
+const rowMenu=document.createElement("div"); rowMenu.className="rowMenu"; rowMenu.hidden=true; document.body.appendChild(rowMenu);
+function closeRowMenu(){ rowMenu.hidden=true; rowMenu.innerHTML=""; }
+function moveRowTo(fromI, j, toI){
+  const src=Q.services[fromI], dst=Q.services[toI]; normCols(src); normCols(dst);
+  const r=src.rows.splice(j,1)[0]; delete r.fee;
+  const x=[]; src.cols.forEach((c,k)=>{ const v=(r.x||[])[k]||""; let t=dst.cols.findIndex(n=>n.trim().toLowerCase()===c.trim().toLowerCase());
+    if(t<0 && v){ dst.cols.push(c); dst.colPos.push(src.colPos[k]||"name"); dst.rows.forEach(rr=>rr.x.push("")); t=dst.cols.length-1; }
+    if(t>=0) x[t]=v; });
+  r.x=dst.cols.map((c,k)=>x[k]||""); dst.rows.push(r); dst.open=true;
+}
+function openRowMenu(btn){
+  const [i,j]=btn.dataset.rowmenu.split(".").map(Number), sv=Q.services[i], n=sv.rows.length;
+  const others=Q.services.map((s,k)=>({s,k})).filter(o=>o.k!==i && o.s.on);
+  let h=`<div class="rmHead">Poradie</div>
+    <button data-ra="up" ${j===0?"disabled":""}>↑ Posunúť vyššie</button>
+    <button data-ra="down" ${j===n-1?"disabled":""}>↓ Posunúť nižšie</button>
+    <button data-ra="first" ${j===0?"disabled":""}>⤒ Na začiatok</button>
+    <button data-ra="last" ${j===n-1?"disabled":""}>⤓ Na koniec</button>`;
+  h += `<div class="rmHead">Presunúť do</div>` + (others.length
+    ? others.map(o=>`<button data-ra="move" data-to="${o.k}">→ ${esc(svcDef(o.s.key).name)}</button>`).join("")
+      + `<div class="rmHead">Všetky riadky (${n}) presunúť do</div>` + others.map(o=>`<button data-ra="moveall" data-to="${o.k}">⇉ ${esc(svcDef(o.s.key).name)}</button>`).join("")
+    : `<div class="rmNote">Najprv zakliknite v ponuke službu, do ktorej chcete riadok presunúť.</div>`);
+  rowMenu.innerHTML=h; rowMenu.openedAt=Date.now(); rowMenu.dataset.i=i; rowMenu.dataset.j=j; rowMenu.hidden=false;
+  const r=btn.getBoundingClientRect(), mh=rowMenu.offsetHeight, mw=rowMenu.offsetWidth;
+  rowMenu.style.left=Math.max(8, Math.min(r.right-mw, innerWidth-mw-8))+"px";
+  rowMenu.style.top=(r.bottom+mh+8>innerHeight ? Math.max(8, r.top-mh-4) : r.bottom+4)+"px";
+}
+$("#form").addEventListener("click", e=>{ const b=e.target.closest("[data-rowmenu]"); if(!b) return; e.preventDefault(); e.stopPropagation(); if(!rowMenu.hidden && rowMenu.dataset.src===b.dataset.rowmenu){ closeRowMenu(); return; } openRowMenu(b); rowMenu.dataset.src=b.dataset.rowmenu; }, true);
+rowMenu.addEventListener("click", e=>{
+  const b=e.target.closest("[data-ra]"); if(!b||b.disabled) return;
+  const i=+rowMenu.dataset.i, j=+rowMenu.dataset.j, rows=Q.services[i].rows, a=b.dataset.ra; let msg="";
+  if(a==="up"){ [rows[j-1],rows[j]]=[rows[j],rows[j-1]]; }
+  else if(a==="down"){ [rows[j+1],rows[j]]=[rows[j],rows[j+1]]; }
+  else if(a==="first"){ rows.unshift(rows.splice(j,1)[0]); }
+  else if(a==="last"){ rows.push(rows.splice(j,1)[0]); }
+  else if(a==="move"){ const to=+b.dataset.to; moveRowTo(i,j,to); msg="Riadok presunutý do: "+svcDef(Q.services[to].key).name; }
+  else if(a==="moveall"){ const to=+b.dataset.to, cnt=rows.length; if(!confirm(`Presunúť všetkých ${cnt} riadkov do služby „${svcDef(Q.services[to].key).name}“?`)) return; while(Q.services[i].rows.length) moveRowTo(i,0,to); msg=`Presunutých ${cnt} riadkov do: `+svcDef(Q.services[to].key).name; }
+  closeRowMenu(); dirty=true; renderAll(); if(msg) toast(msg);
+});
+document.addEventListener("click", e=>{ if(!rowMenu.hidden && !rowMenu.contains(e.target) && !e.target.closest("[data-rowmenu]")) closeRowMenu(); });
+document.addEventListener("keydown", e=>{ if(e.key==="Escape") closeRowMenu(); });
+$("#form").addEventListener("scroll", ()=>{ if(Date.now()-(rowMenu.openedAt||0)>400) closeRowMenu(); }, {passive:true});
+
 /* ════════════════ synchronizácia náhľadu s formulárom ════════════════ */
 (function(){
   const form=$("#form"), wrap=$("#previewWrap"); let last="", t=null, lock=0;
   function secAt(y){ let cur=null; form.querySelectorAll("[data-sec]").forEach(el=>{ if(el.getBoundingClientRect().top<=y) cur=el; }); return cur && cur.dataset.sec; }
   function go(sec){
     if(!sec || !wrap.offsetParent) return;
-    if(sec==="inv"){ if(previewMode!=="inv") return; sec="__top"; }
-    else if(previewMode==="inv") return;
+    if(sec==="inv"){ if(previewMode==="quote") return; sec="__top"; }
+    else if(previewMode!=="quote") return;
     if(sec===last) return; last=sec;
     let el = sec==="__top" ? $("#pages") : $("#pages").querySelector(`[data-anchor="${sec}"]`);
     if(!el && sec.startsWith("texts-")) el=$("#pages").querySelector('[data-anchor="client"]');
