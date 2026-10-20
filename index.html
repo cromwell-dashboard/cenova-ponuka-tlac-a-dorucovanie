@@ -560,6 +560,21 @@ ul.sepList li.gapB{margin-top:14px!important}
 
 .navSep{width:1px; align-self:stretch; margin:4px 2px; background:var(--line)}
 @media (max-width:980px){ .navSep{display:none} .nav button{font-size:12px; padding:7px 4px} }
+
+.sepRow{display:grid!important; grid-template-columns:auto 1fr 16px 18px!important; gap:6px!important; margin:10px 0 6px!important; padding-top:8px; border-top:1px dashed var(--line); align-items:center}
+.sepTag{font-size:10.5px; font-weight:600; text-transform:uppercase; letter-spacing:.5px; color:var(--blue)}
+.sepCell{font-weight:600; color:var(--blue)!important}
+table.prices:not(.iTbl) thead th:first-child{width:46%}
+.tblTitle{font-size:12px; font-weight:700; color:#3552CC; margin:2px 0 8px; letter-spacing:.2px}
+.subTot span,.subTot b{font-size:11px!important}
+.totCard.subTot{padding-top:4px!important}
+.grandTot{margin-top:6px!important; border-top:1.5px solid #3552CC; width:300px!important; margin-left:auto!important; padding-top:8px!important}
+.grandTot span,.grandTot b{color:#3552CC!important}
+
+.cv-badgeImg{position:absolute; left:429px; top:-27px; width:150px; height:150px; display:block}
+.cenyHead{display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:10px}
+.cenyHead .pill{margin:0}
+.cenyHead .meta{font-size:9.5px; color:#7A8199; letter-spacing:.3px; white-space:nowrap}
 </style>
 </head>
 <body>
@@ -916,7 +931,7 @@ function fmtSum(n){ return n.toLocaleString("sk-SK",{minimumFractionDigits:2,max
 const FEE_LIMIT=5000, FEE_PRICE="80", FEE_NAME="Manipulačný poplatok – náklad do 5 000 ks";
 function checkFee(s){
   if(!svcDef(s.key).minFee) return false;
-  const q=s.rows.filter(r=>!r.fee).map(r=>num(r.qty)).filter(v=>!isNaN(v)&&v>0);
+  const q=s.rows.filter(r=>!r.fee&&!r.sep).map(r=>num(r.qty)).filter(v=>!isNaN(v)&&v>0);
   const need=q.length>0 && Math.max(...q)<FEE_LIMIT, has=s.rows.some(r=>r.fee);
   if(need && !has && !s.feeDismissed){ normCols(s); s.rows.push({name:FEE_NAME,qty:"1",unit:"ks",price:FEE_PRICE,fee:true,x:s.cols.map(()=>"")}); return true; }
   if(!need){ s.feeDismissed=false; if(has){ s.rows=s.rows.filter(r=>!r.fee); return true; } }
@@ -980,7 +995,7 @@ function renderForm(){
       <div class="sub" data-sec="prices-${s.key}">Ceny</div>
       ${s.cols.length?`<div class="colsEd">${s.cols.map((c,k)=>`<div class="colChip"><input class="cell" data-p="services.${i}.cols.${k}" value="${esc(c)}" placeholder="Názov stĺpca"><select class="cell posSel" data-colposset="${i}.${k}" title="Umiestnenie v PDF">${COLPOS.map(([v,l])=>`<option value="${v}" ${(s.colPos[k]||"name")===v?"selected":""}>${l}</option>`).join("")}</select><button class="x" data-delcol="${i}.${k}" aria-label="Odstrániť stĺpec">×</button></div>`).join("")}</div>`:""}
       <div class="priceRow priceHead" style="${gridCols(s)}"><span>Položka</span>${s.cols.map(c=>`<span>${esc(c||"Stĺpec")}</span>`).join("")}<span>Množstvo</span><span>Jednotka</span><span>Cena / j.</span><span>Spolu</span><span></span><span></span></div>
-      ${s.rows.map((r,j)=>`<div class="priceRow" style="${gridCols(s)}">
+      ${s.rows.map((r,j)=> r.sep ? `<div class="priceRow sepRow"><span class="sepTag">Tabuľka</span><input class="cell sepCell" data-p="services.${i}.rows.${j}.name" value="${esc(r.name)}" placeholder="Názov tabuľky (napr. Tlač, Doručenie…)"><button class="rm" data-rowmenu="${i}.${j}" aria-label="Možnosti" title="Posunúť alebo presunúť">⋮</button><button class="x" data-delrow="${i}.${j}" aria-label="Odstrániť tabuľku" title="Odstráni len nadpis – riadky sa pripoja k predchádzajúcej tabuľke">×</button></div>` : `<div class="priceRow" style="${gridCols(s)}">
         <textarea class="cell nameCell ${r.fee?"feeCell":""}" data-p="services.${i}.rows.${j}.name" rows="1" wrap="off" placeholder="Názov položky" title="${esc(r.fee?"Pridané automaticky – náklad je nižší ako 5 000 ks. Krížikom ho môžete odstrániť.\n"+r.name:r.name)}">${esc(r.name)}</textarea>
         ${s.cols.map((c,k)=>`<input class="cell" data-p="services.${i}.rows.${j}.x.${k}" value="${esc(r.x[k]||"")}">`).join("")}
         <input class="cell" data-p="services.${i}.rows.${j}.qty" value="${esc(r.qty)}" placeholder="2 600" inputmode="decimal">
@@ -994,8 +1009,10 @@ function renderForm(){
         <div class="addWith"><button class="add" data-addcol="${i}">+ Pridať stĺpec</button>
           <select class="cell" data-colpos="${i}" title="Kam vložiť nový stĺpec">${COLPOS.map(([v,l])=>`<option value="${v}">${l}</option>`).join("")}</select></div>
       </div>
+      <button class="add" data-addtable="${i}" style="margin-top:6px">+ Pridať ďalšiu tabuľku do tejto služby</button>
       <label class="totTog"><input type="checkbox" data-tottog="${i}" ${s.showTotal!==false?"checked":""}> Zobraziť v ponuke stĺpec „Cena spolu“</label>
       <label class="totTog" style="margin-top:4px"><input type="checkbox" data-sumtog="${i}" ${showSumRow(s)?"checked":""}> Zobraziť v ponuke súčtový riadok</label>
+      <label class="totTog" style="margin-top:4px"><input type="checkbox" data-vattog="${i}" ${s.showVatNote!==false?"checked":""}> Zobraziť v ponuke text „Všetky ceny sú uvedené bez DPH“</label>
       <div class="sumLine">Spolu: <b data-sum="${i}">${isNaN(tot)?"—":fmtSum(tot)}</b> bez DPH</div>
       <p class="hint" style="margin-top:6px">Ak do množstva napíšete rozpätie (napr. 100 000 – 149 999), riadok sa zobrazí ako cenník bez súčtu. Pri pridávaní riadka alebo stĺpca si v rozbaľovacom zozname vyberte, kam sa má vložiť. Umiestnenie stĺpca v PDF zmeníte aj neskôr v políčku pri jeho názve.</p>
 
@@ -1078,9 +1095,9 @@ $("#form").addEventListener("input", e=>{
   }
   schedulePreview();
 });
-$("#form").addEventListener("change", e=>{ { const m=(e.target.dataset.p||"").match(/^services\.(\d+)\.rows\.\d+\.qty$/); if(m){ if(checkFee(Q.services[+m[1]])) setTimeout(()=>{ renderForm(); renderPreview(); },0); return; } } if((e.target.dataset.p||"").startsWith("inv.")){ renderPreview(); } if(e.target.dataset.colposset){ const [i,k]=e.target.dataset.colposset.split(".").map(Number); Q.services[i].colPos[k]=e.target.value; dirty=true; renderPreview(); return; } if(e.target.dataset.rowpos!=null||e.target.dataset.colpos!=null||e.target.dataset.specpos!=null) return; if(e.target.dataset.tottog!=null){ Q.services[+e.target.dataset.tottog].showTotal=e.target.checked; dirty=true; renderPreview(); return; } if(e.target.dataset.sumtog!=null){ Q.services[+e.target.dataset.sumtog].showSumRow=e.target.checked; dirty=true; renderPreview(); return; } if(/\.cols\./.test(e.target.dataset.p||"")){ renderAll(); return; } if(e.target.tagName==="SELECT"){ set(e.target.dataset.p,e.target.value); const m=(e.target.dataset.p||"").match(/^services\.(\d+)\.rows\.(\d+)\.unit$/); if(m) derive(Q.services[+m[1]].rows[+m[2]]); dirty=true; renderAll(); } });
+$("#form").addEventListener("change", e=>{ { const m=(e.target.dataset.p||"").match(/^services\.(\d+)\.rows\.\d+\.qty$/); if(m){ if(checkFee(Q.services[+m[1]])) setTimeout(()=>{ renderForm(); renderPreview(); },0); return; } } if((e.target.dataset.p||"").startsWith("inv.")){ renderPreview(); } if(e.target.dataset.colposset){ const [i,k]=e.target.dataset.colposset.split(".").map(Number); Q.services[i].colPos[k]=e.target.value; dirty=true; renderPreview(); return; } if(e.target.dataset.rowpos!=null||e.target.dataset.colpos!=null||e.target.dataset.specpos!=null) return; if(e.target.dataset.tottog!=null){ Q.services[+e.target.dataset.tottog].showTotal=e.target.checked; dirty=true; renderPreview(); return; } if(e.target.dataset.vattog!=null){ Q.services[+e.target.dataset.vattog].showVatNote=e.target.checked; dirty=true; renderPreview(); return; } if(e.target.dataset.sumtog!=null){ Q.services[+e.target.dataset.sumtog].showSumRow=e.target.checked; dirty=true; renderPreview(); return; } if(/\.cols\./.test(e.target.dataset.p||"")){ renderAll(); return; } if(e.target.tagName==="SELECT"){ set(e.target.dataset.p,e.target.value); const m=(e.target.dataset.p||"").match(/^services\.(\d+)\.rows\.(\d+)\.unit$/); if(m) derive(Q.services[+m[1]].rows[+m[2]]); dirty=true; renderAll(); } });
 $("#form").addEventListener("click", e=>{
-  const t=e.target.closest("[data-tog],[data-fold],[data-addrow],[data-delrow],[data-addspec],[data-delspec],[data-go],[data-addon],[data-addcol],[data-delcol],[data-tstyle],[data-mvspec],[data-layout],[data-invshow],[data-invpdf],[data-objshow],[data-objpdf],[data-invedit],[data-invreset],[data-invadd],[data-invdel]"); if(!t) return;
+  const t=e.target.closest("[data-tog],[data-fold],[data-addrow],[data-delrow],[data-addspec],[data-delspec],[data-go],[data-addon],[data-addcol],[data-delcol],[data-tstyle],[data-mvspec],[data-layout],[data-invshow],[data-invpdf],[data-objshow],[data-objpdf],[data-addtable],[data-invedit],[data-invreset],[data-invadd],[data-invdel]"); if(!t) return;
   e.preventDefault();
   if(t.dataset.go){ show(t.dataset.go); return; }
   if(t.dataset.invshow){ setPreviewMode("inv"); return; }
@@ -1090,6 +1107,7 @@ $("#form").addEventListener("click", e=>{
   if(t.dataset.invdel!=null){ Q.inv.rows.splice(+t.dataset.invdel,1); }
   if(t.dataset.invpdf){ setPreviewMode("inv"); makePdf("inv"); return; }
   if(t.dataset.objshow){ setPreviewMode("obj"); return; }
+  if(t.dataset.addtable!=null){ const sv=Q.services[+t.dataset.addtable]; normCols(sv); sv.rows.push({sep:true,name:"",x:sv.cols.map(()=>"")}, {name:"",qty:"",unit:"ks",price:"",x:sv.cols.map(()=>"")}); }
   if(t.dataset.objpdf){ setPreviewMode("obj"); makePdf("obj"); return; }
   if(t.dataset.tstyle){ Q.tableStyle=t.dataset.tstyle; }
   if(t.dataset.layout){ Q.pageLayout=t.dataset.layout; if(t.dataset.layout==="moderne") Q.tableStyle="karta"; }
@@ -1147,7 +1165,7 @@ function buildPages(){
     <div class="l1">KLIENTSKE RIEŠENIA</div>
     <div class="l2">POD JEDNOU STRECHOU</div>
     <div class="l3">digitálne, tlačové a doručovacie služby</div>
-    <div class="cv-badge"><span class="s">viac ako</span><span class="n">30</span><span class="s">rokov na trhu</span></div>
+    ${BADGE_IMG?`<img class="cv-badgeImg" src="${BADGE_IMG}" alt="viac ako 30 rokov na trhu">`:`<div class="cv-badge"><span class="s">viac ako</span><span class="n">30</span><span class="s">rokov na trhu</span></div>`}
   </div>
   <div class="cv-cards">${COVER_TILES.map((t,i)=>`<div class="cv-card ${coverOn.has(t)?"on":""}">
       <img src="${IMG_CARDS[i]}" width="124" height="247" alt="">
@@ -1193,7 +1211,7 @@ function buildPages(){
     const d=svcDef(s.key), tot=svcTotal(s);
     const ben=lines(s.benefits), cond=lines(s.conditions);
     const spec=s.spec.filter(r=>r[0]||r[1]);
-    normCols(s); const cols=s.cols; const rows=s.rows.filter(r=>r.name||r.qty||r.price||(r.x||[]).some(v=>v));
+    normCols(s); const cols=s.cols; const rows=s.rows.filter(r=>!r.sep && (r.name||r.qty||r.price||(r.x||[]).some(v=>v)));
     const computable = rows.some(r=>!isNaN(rowTotal(r))); const anyTotal = s.showTotal!==false && computable; const sumRow = showSumRow(s) && computable;
     const unitHdr = rows.every(r=>r.unit==="1000 ks")? "Cena za 1000 ks" : rows.every(r=>r.unit==="ks")? "Cena / ks" : "Cena / j.";
     const blocks=[], ph=PHOTO(d.photo);
@@ -1206,19 +1224,33 @@ function buildPages(){
       <div class="specList">${spec.map(r=>`<div class="sr"><div class="k">${esc(r[0])}</div><div class="v">${rt(r[1])||"<span style='color:#B0B5C8'>—</span>"}</div></div>`).join("")}</div></div>`);
     else if(spec.length) blocks.push(`<div class="block" data-anchor="spec-${s.key}"><div class="lblRow"><span class="pill">ŠPECIFIKÁCIA</span><span class="pill wide light">CENOVÁ PONUKA ${esc(qnum)}</span></div><div class="spec">${spec.map(r=>`<div class="l">${esc(r[0])}</div><div>${rt(r[1])||"<span style='color:#B0B5C8'>—</span>"}</div>`).join("")}</div></div>`);
     if(rows.length){
+      // jedna služba môže mať viac tabuliek – oddeľujú ich riadky typu „tabuľka“
+      const groups=[{title:"",rows:[]}];
+      s.rows.forEach(r=>{ if(r.sep){ groups.push({title:r.name||"",rows:[]}); return; } if(r.name||r.qty||r.price||(r.x||[]).some(v=>v)) groups[groups.length-1].rows.push(r); });
+      const G=groups.filter(g=>g.rows.length), multi=G.length>1, wantSum=showSumRow(s);
       const X=pos=>cols.map((c,k)=>({c,k})).filter(o=>(s.colPos[o.k]||"name")===pos).map(o=>({h:esc(o.c), cls:"", v:r=>rt(r.x[o.k]||"")}));
-      const C=[{h:"Položka",cls:"",v:r=>esc(r.name)}, ...X("name"),
-        {h:"Množstvo",cls:"n",v:r=>esc(fmtQty(r.qty))}, ...X("qty"),
-        {h:unitHdr,cls:"n p",v:r=>{const p=num(r.price); return isNaN(p)?esc(r.price):fmtPrice(p,s.key);}}, ...X("price")];
-      const totIdx = anyTotal? C.length : -1;
-      if(anyTotal) C.push({h:"Cena spolu",cls:"n",v:r=>{const t=rowTotal(r); return isNaN(t)?"–":fmtSum(t);}});
-      C.push(...X("total"));
-      blocks.push(`<div class="block" data-anchor="prices-${s.key}">${MOD?`<div class="secHead"><span class="pill">CENY</span><span class="rule"></span><span class="meta">všetky ceny sú uvedené bez DPH</span></div>`:`<span class="pill">CENY</span>`}
+      G.forEach((g,gi)=>{
+        const gr=g.rows, gComp=gr.some(r=>!isNaN(rowTotal(r))), gTot=gr.map(rowTotal).filter(v=>!isNaN(v)).reduce((a,b)=>a+b,0);
+        const gAny=s.showTotal!==false && gComp, gSum=wantSum && gComp, last=gi===G.length-1;
+        const uh = gr.every(r=>r.unit==="1000 ks")? "Cena za 1000 ks" : gr.every(r=>r.unit==="ks")? "Cena / ks" : "Cena / j.";
+        const C=[{h:"Položka",cls:"",v:r=>esc(r.name)}, ...X("name"),
+          {h:"Množstvo",cls:"n",v:r=>esc(fmtQty(r.qty))}, ...X("qty"),
+          {h:uh,cls:"n p",v:r=>{const p=num(r.price); return isNaN(p)?esc(r.price):fmtPrice(p,s.key);}}, ...X("price")];
+        const totIdx = gAny? C.length : -1;
+        if(gAny) C.push({h:"Cena spolu",cls:"n",v:r=>{const t=rowTotal(r); return isNaN(t)?"–":fmtSum(t);}});
+        C.push(...X("total"));
+        const lbl = multi? "Medzisúčet bez DPH" : "Spolu bez DPH";
+        const head = gi===0 ? (MOD?`<div class="secHead"><span class="pill">CENY</span><span class="rule"></span>${s.showVatNote!==false?`<span class="meta">Všetky ceny sú uvedené bez DPH</span>`:""}</div>`:`<div class="cenyHead"><span class="pill">CENY</span>${s.showVatNote!==false?`<span class="meta">Všetky ceny sú uvedené bez DPH</span>`:""}</div>`) : "";
+        const totRow = gSum&&!MOD ? (gAny? `<tr class="tot"><td colspan="${totIdx}">${lbl}</td><td class="n">${fmtSum(gTot)}</td>${C.slice(totIdx+1).map(()=>"<td></td>").join("")}</tr>` : `<tr class="tot"><td colspan="${C.length-1}">${lbl}</td><td class="n">${fmtSum(gTot)}</td></tr>`) : "";
+        const grand = last && multi && wantSum && !isNaN(tot) ? `<div class="totCard grandTot"><span>Spolu bez DPH</span><b>${fmtSum(tot)}</b></div>` : "";
+        blocks.push(`<div class="block" ${gi===0?`data-anchor="prices-${s.key}"`:""}>${head}${g.title?`<div class="tblTitle">${esc(g.title)}</div>`:""}
         <div class="tblWrap ts-${Q.tableStyle||"minimal"}"><table class="prices"><thead><tr>${C.map(c=>`<th class="${c.cls.includes("n")?"n":""}">${c.h}</th>`).join("")}</tr></thead><tbody>
-        ${rows.map(r=>`<tr>${C.map(c=>`<td class="${c.cls}">${c.v(r)}</td>`).join("")}</tr>`).join("")}
-        ${sumRow&&!isNaN(tot)&&!MOD? (anyTotal? `<tr class="tot"><td colspan="${totIdx}">Spolu bez DPH</td><td class="n">${fmtSum(tot)}</td>${C.slice(totIdx+1).map(()=>"<td></td>").join("")}</tr>` : `<tr class="tot"><td colspan="${C.length-1}">Spolu bez DPH</td><td class="n">${fmtSum(tot)}</td></tr>`) :""}
-        </tbody></table></div>${MOD&&sumRow&&!isNaN(tot)?`<div class="totCard"><span>Spolu bez DPH</span><b>${fmtSum(tot)}</b></div>`:""}${s.note&&s.note.trim()?`<div class="note">${rtp(s.note)}</div>`:""}</div>`);
+        ${gr.map(r=>`<tr>${C.map(c=>`<td class="${c.cls}">${c.v(r)}</td>`).join("")}</tr>`).join("")}
+        ${totRow}
+        </tbody></table></div>${MOD&&gSum?`<div class="totCard ${multi?"subTot":""}"><span>${lbl}</span><b>${fmtSum(gTot)}</b></div>`:""}${grand}${last&&s.note&&s.note.trim()?`<div class="note">${rtp(s.note)}</div>`:""}</div>`);
+      });
     }
+
     if(cond.length && MOD) blocks.push(`<div class="block condBlock condModern" data-anchor="cond-${s.key}">
         <img class="photoImg" src="${PHOTO_S(d.photo)}" width="170" height="134" style="width:170px;height:134px" alt="">
         <div><div class="condTtl">Obchodné podmienky</div><ul class="doc small">${liHTML(s.conditions)}</ul></div></div>`);
@@ -1331,6 +1363,24 @@ addEventListener("resize", ()=>{ $("#pages").style.transform=""; $("#pages").sty
 function renderAll(){ Q.services.forEach(sv=>{ if(sv.on) checkFee(sv); }); renderForm(); renderPreview(); }
 
 
+/* ════════════════ odznak „30 rokov“ ako obrázok (presný vzhľad aj v PDF) ════════════════ */
+let BADGE_IMG="";
+async function makeBadge(){
+  try{ await document.fonts.ready; await document.fonts.load("700 34px Poppins"); await document.fonts.load("500 9px Poppins"); }catch(e){}
+  const k=3, S=150, cv=document.createElement("canvas"); cv.width=cv.height=S*k; const c=cv.getContext("2d"); c.scale(k,k);
+  const cx=S/2, cy=S/2-4, F='"Poppins","Segoe UI",sans-serif';
+  c.save(); c.shadowColor="rgba(20,24,40,.16)"; c.shadowBlur=20; c.shadowOffsetY=8;
+  c.fillStyle="#3552CC"; c.beginPath(); c.arc(cx,cy,57,0,Math.PI*2); c.fill(); c.restore();
+  c.fillStyle="#FFFFFF"; c.beginPath(); c.arc(cx,cy,55,0,Math.PI*2); c.fill();
+  c.fillStyle="#EFEFF0"; c.beginPath(); c.arc(cx,cy,52,0,Math.PI*2); c.fill();
+  c.translate(cx,cy); c.rotate(-10*Math.PI/180); c.fillStyle="#3552CC"; c.textAlign="center"; c.textBaseline="middle";
+  const sp=t=>{ try{ c.letterSpacing=t; }catch(e){} };
+  sp("0.6px"); c.font=`500 8.5px ${F}`; c.fillText("VIAC AKO",0,-23);
+  sp("-0.5px"); c.font=`700 34px ${F}`; c.fillText("30",0,1);
+  sp("0.6px"); c.font=`500 8.5px ${F}`; c.fillText("ROKOV NA TRHU",0,24);
+  BADGE_IMG=cv.toDataURL("image/png");
+}
+
 /* ════════════════ zálohová faktúra ════════════════ */
 function objAutoText(){
   const I=Q.inv||blankInv(), act=activeSvcs();
@@ -1402,7 +1452,7 @@ async function makePdf(mode){ mode = (mode==="inv"||mode==="obj")?mode:"quote";
   if(renderPreview.over) toast("Pozor: niektorá strana je príliš dlhá (červený rámik). Obsah by sa orezal.",3500);
   const btn=$("#bPdf"); btn.disabled=true; btn.textContent="Pripravujem PDF…";
   try{
-    await document.fonts.ready;
+    await document.fonts.ready; if(!BADGE_IMG) await makeBadge();
     const html = mode==="quote" ? buildPages() : buildInvoice(mode); const stage=$("#stage"); stage.innerHTML=html; if(mode==="quote") await fitIntroPhotos(stage);
     const pages=[...stage.querySelectorAll(".page")];
     const { jsPDF } = window.jspdf;
@@ -1597,6 +1647,7 @@ $("#form").addEventListener("scroll", ()=>{ if(Date.now()-(rowMenu.openedAt||0)>
 /* ════════════════ štart ════════════════ */
 (async function start(){
   profile = blankProfile(); Q = newQuote(); renderAll();
+  makeBadge().then(()=>{ if(previewMode==="quote") renderPreview(); });
   await Store.init();
   $("#storeMode").textContent = Store.mode==="cloud" ? "" : "· údaje sa ukladajú v tomto prehliadači";
   try{ const p=await Store.getProfile(); if(p) profile=Object.assign(blankProfile(),p); }catch(e){}
