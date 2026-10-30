@@ -967,6 +967,8 @@ const CP_COL="cenovePonuky", CP_PROF="cpProfiles";
 /* oddelenie ponuky = segment zo Zappisu podľa prvej služby v ponuke */
 const SVC_DEPT={hp:"ad", nd:"nad", tl:"nad", ts:"tlac"};
 const DEPT_NAME={ad:"Adresné", nad:"Neadresné", tlac:"Tlač", baliky:"Balíky", digital:"Digitálne", zelena:"Zelená pošta"};
+function encQ(q){ (q.services||[]).forEach(s=>{ if(Array.isArray(s.spec)) s.spec=s.spec.map(r=>Array.isArray(r)?{k:r[0]??"",v:r[1]??"",a:r[2]??null}:r); }); return q; }
+function decQ(q){ (q.services||[]).forEach(s=>{ if(Array.isArray(s.spec)) s.spec=s.spec.map(r=>Array.isArray(r)?r:(r.a?[r.k,r.v,r.a]:[r.k,r.v])); }); return q; }
 function quoteDept(q){ const f=(q.services||[]).find(s=>s.on); return SVC_DEPT[f?.key]||"ad"; }
 
 const Store = {
@@ -1003,7 +1005,7 @@ const Store = {
     const qs = this.seesAll ? [col] : [query(col, where("ownerUid","==",this.uid))];
     const segs=(this.me.segments||[]).slice(0,30);
     if(!this.seesAll && segs.length) qs.push(query(col, where("dept","in",segs)));
-    for(const q of qs){ const snap=await getDocs(q); snap.forEach(d=>out.set(d.id,d.data())); }
+    for(const q of qs){ const snap=await getDocs(q); snap.forEach(d=>out.set(d.id,decQ(d.data()))); }
     return [...out.values()];
   },
   /* uloženie s kontrolou súbežnej úpravy: ak ponuku medzitým uložil niekto iný, vráti konflikt */
@@ -1014,10 +1016,10 @@ const Store = {
       if(old && !force && (old.version||0)!==(q.version||0)){
         const e=new Error("conflict"); e.code="conflict"; e.by=old.updatedByName; e.at=old.updatedAt; throw e; }
       const now=new Date().toISOString();
-      const data=JSON.parse(JSON.stringify(Object.assign({}, q, {
+      const data=encQ(JSON.parse(JSON.stringify(Object.assign({}, q, {
         ownerUid: old? old.ownerUid : me.uid, ownerName: old? old.ownerName : me.name,
         createdAt: old? old.createdAt : now, dept: quoteDept(q),
-        updatedAt: now, updatedByUid: me.uid, updatedByName: me.name, version:(old?.version||0)+1 })));
+        updatedAt: now, updatedByUid: me.uid, updatedByName: me.name, version:(old?.version||0)+1 }))));
       tx.set(ref, data); return data;
     });
   },
@@ -1681,7 +1683,7 @@ async function saveQuote(silent, force){
       if(confirm(`Ponuku medzitým upravil(a) ${e.by||"kolega"}${kedy?" ("+kedy+")":""}.\n\nOK = prepísať jeho/jej zmeny vašimi\nZrušiť = neukladať (ponuku potom otvorte znova z Mojich ponúk)`)) return saveQuote(silent,true);
       toast("Neuložené – ponuku medzitým zmenil niekto iný.",4000); return false;
     }
-    console.error(e); toast(e.code==="permission-denied"?"Na uloženie tejto ponuky nemáte oprávnenie.":"Uloženie zlyhalo — skúste to znova."); return false;
+    console.error(e); toast(e.code==="permission-denied"?"Na uloženie tejto ponuky nemáte oprávnenie (skontrolujte pravidlá Firestore).":"Uloženie zlyhalo ("+(e.code||e.message||"neznáma chyba")+").",6000); return false;
   }
 }
 
