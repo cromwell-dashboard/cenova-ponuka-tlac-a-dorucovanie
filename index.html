@@ -596,6 +596,65 @@ table.prices:not(.iTbl) thead th:first-child{width:46%}
 .statSig b{font-weight:600; color:#141828}
 .statSig span{color:#6B7390; font-size:10px}
 .page.ft2 .statPlace,.page.ft3 .statPlace{margin-bottom:24px}
+
+/* distribučné cykly */
+.grid3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px}
+.cycGrid{display:grid; grid-template-columns:1fr 26px 1fr 26px 1fr; align-items:stretch}
+.cycStep{background:#EFEFF0; border-radius:12px; padding:12px 14px 12px; display:flex; flex-direction:column}
+.cycTop{display:flex; align-items:center; justify-content:space-between; margin-bottom:8px}
+.cycIco{width:32px; height:32px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center}
+.cycNo{font-size:8.5px; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:#8A90A6}
+.cycT{font-size:12px; font-weight:700; color:#3552CC; margin-bottom:3px}
+.cycS{font-size:9.6px; line-height:1.4; color:#4A5068; flex:1}
+.cycDay{margin-top:10px; align-self:flex-start; background:#3552CC; color:#fff; font-size:10.5px; font-weight:600; padding:4px 12px; border-radius:20px}
+.cycArr{display:flex; align-items:center; justify-content:center}
+.cycNote{display:flex; gap:10px; align-items:flex-start; margin-top:10px; font-size:10px; line-height:1.45; color:#4A5068}
+.cycNote b{flex:0 0 auto; width:16px; height:16px; border-radius:50%; border:1.2px solid #3552CC; color:#3552CC; font-size:9.5px; display:flex; align-items:center; justify-content:center; font-style:italic; margin-top:1px}
+.page.c2 .cycStep{padding:9px 12px} .page.c2 .cycS{font-size:9px}
+@media (max-width:480px){ .grid3{grid-template-columns:1fr} }
+
+/* v11 – kompaktné cykly, hranaté rohy v dokumente (ako logo Cromwell) */
+.cycStep{padding:10px 12px!important}
+.cycHead{display:flex; align-items:center; gap:8px; margin-bottom:4px}
+.cycIco{width:28px!important; height:28px!important; border-radius:2px!important; flex:0 0 auto}
+.cycHead .cycT{margin:0!important}
+.cycS{font-size:9.6px}
+.cycDay{margin-top:8px!important}
+.page .pill,.page .pill.lbl,.page .pill.wide,.page .datePill,.page .lblRow .pill,
+.page .greybox,.page .gbList,.page .blueBox,.page .callout,.page .sigWho,.page .photoImg,.page img.photoImg,
+.page .cv-card,.page .cv-stats div,.page .cv-pno,.page .ts-karta,.page .tblWrap,
+.page .cycStep,.page .cycDay,.page .iParties > div,.page .condModern,.page .refImg{border-radius:5px!important}
+.page .ts-modra table.prices th:first-child{border-radius:5px 0 0 5px!important}
+.page .ts-modra table.prices th:last-child{border-radius:0 5px 5px 0!important}
+
+/* v12 – distribučné cykly v jednej karte, rovnaká šírka štítkov sekcií */
+.page .cycGrid{display:grid; grid-template-columns:1fr 22px 1fr 22px 1fr; align-items:center; background:#EFEFF0; border-radius:5px; padding:12px 16px}
+.page .cycStep{background:transparent!important; padding:0!important; border-radius:0!important; display:flex; flex-direction:column; align-items:flex-start}
+.page .cycHead{margin-bottom:6px}
+.page .cycIco{background:#fff}
+.page .cycDay{margin-top:0!important}
+.page .cenyHead .pill,.page .secHead .pill{width:160px; min-width:160px; text-align:center; display:inline-block}
+
+/* v13 – distribučné cykly: šípkový pás */
+.chev{position:relative; width:678px; height:64px}
+.chev svg{display:block}
+.chevTx{position:absolute; top:0; height:64px; display:flex; flex-direction:column; justify-content:center; color:#fff; line-height:1.25}
+.chevTx span{font-size:11px; font-weight:400; opacity:.92}
+.chevTx b{font-size:15px; font-weight:700}
+.cycNote2{font-size:9.6px; color:#6B7390; line-height:1.45; margin-top:10px}
+.page.c2 .cycNote2{margin-top:6px}
+
+/* prihlásenie */
+.login{position:fixed; inset:0; z-index:100; background:var(--bg); display:flex; align-items:center; justify-content:center; padding:16px}
+.lCard{width:min(380px,100%); background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:28px 26px; box-shadow:0 10px 30px rgba(20,30,80,.08)}
+.lLead{text-align:center; color:var(--muted); font-size:13px; margin:0 0 18px}
+.lG{width:100%; display:flex; align-items:center; justify-content:center; gap:10px}
+.lOr{display:flex; align-items:center; gap:10px; color:var(--muted); font-size:12px; margin:16px 0 10px}
+.lOr::before,.lOr::after{content:""; flex:1; height:1px; background:var(--line)}
+.lMsg{color:var(--warn); font-size:12.5px; text-align:center; margin:12px 0 0; min-height:1em}
+.lOut{padding:6px 12px; font-size:12px}
+.chip.dept{background:#EFEFF0; color:#4A5068}
+@media print{ .login,.lOut{display:none!important} }
 </style>
 </head>
 <body>
@@ -611,6 +670,7 @@ table.prices:not(.iTbl) thead th:first-child{width:46%}
       <button data-view="profile">Môj profil</button>
     </nav>
     <div class="who" id="whoTop"></div>
+    <button class="btn lOut" id="bLogout" type="button">Odhlásiť</button>
   </header>
 
   <div class="main">
@@ -634,7 +694,8 @@ table.prices:not(.iTbl) thead th:first-child{width:46%}
     <div class="view" id="vList" hidden>
       <div class="narrow">
         <h2>Moje ponuky</h2>
-        <p class="lead">Uložené ponuky vidíte iba vy. Otvorte ich na úpravu alebo z nich spravte kópiu pre ďalšieho klienta.</p>
+        <p class="lead">Vidíte svoje ponuky a ponuky kolegov z vášho oddelenia. Môžete ich otvoriť, upraviť alebo z nich spraviť kópiu. Zmazať môže ponuku len jej autor.</p>
+        <div id="qImport"></div>
         <input class="search" id="qSearch" placeholder="Hľadať podľa klienta alebo čísla ponuky…">
         <div class="qlist" id="qList"></div>
       </div>
@@ -678,6 +739,22 @@ table.prices:not(.iTbl) thead th:first-child{width:46%}
   </div>
 </div>
 <div id="stage" aria-hidden="true"></div>
+<div class="login" id="login" hidden>
+  <div class="lCard">
+    <div class="logo" style="justify-content:center;margin-bottom:18px"><div class="mark">Cromwell</div> Cenové ponuky</div>
+    <p class="lLead">Prihláste sa rovnakými údajmi ako do Zappisu.</p>
+    <div id="lBox">
+      <button class="btn lG" id="lGoogle" type="button"><svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg> Prihlásiť sa cez Google</button>
+      <div class="lOr"><span>alebo e-mailom</span></div>
+      <form id="lForm">
+        <div class="fld"><label>E-mail</label><input id="lEmail" type="email" autocomplete="username" required></div>
+        <div class="fld"><label>Heslo</label><input id="lPass" type="password" autocomplete="current-password" required></div>
+        <button class="btn primary" style="width:100%" type="submit">Prihlásiť sa</button>
+      </form>
+    </div>
+    <p class="lMsg" id="loginMsg"></p>
+  </div>
+</div>
 <div class="toast" id="toast" hidden></div>
 
 <script>
@@ -687,7 +764,7 @@ table.prices:not(.iTbl) thead th:first-child{width:46%}
    ════════════════════════════════════════════════════════════════ */
 const SERVICES = [
 {
-  key:"hp", photo:"mail", refs:"hp", name:"Hromadná pošta", title:"Poštové služby: Hromadná pošta", cover:"Poštové služby",
+  key:"hp", cycles:true, photo:"mail", refs:"hp", name:"Hromadná pošta", title:"Poštové služby: Hromadná pošta", cover:"Poštové služby",
   intro:"Spoločnosť **Cromwell a. s.** predkladá cenovú ponuku na spracovanie a adresné doručenie transakčnej alebo marketingovej korešpondencie v roku 2026, na základe požadovanej špecifikácie.",
   benefits:[
     "**Najrozsiahlejšie pokrytie** – vlastnou distribučnou sieťou, 96 % územia SR.",
@@ -876,42 +953,75 @@ const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;
 const clone = o => JSON.parse(JSON.stringify(o));
 function toast(msg, ms=2600){ const t=$("#toast"); t.textContent=msg; t.hidden=false; clearTimeout(toast._t); toast._t=setTimeout(()=>t.hidden=true, ms); }
 
+/* ════════════════ Firebase – ten istý projekt ako Zappis ════════════════ */
+const firebaseConfig = {
+  apiKey:            "AIzaSyAi271i_qgsKiAeVBFOCbUfKccgyBClxSc",
+  authDomain:        "cromwellgroup-tyzdenny-report.firebaseapp.com",
+  projectId:         "cromwellgroup-tyzdenny-report",
+  storageBucket:     "cromwellgroup-tyzdenny-report.firebasestorage.app",
+  messagingSenderId: "998598557554",
+  appId:             "1:998598557554:web:dcf8a546fcf8423386e7eb"
+};
+const FBV="10.14.1";
+const CP_COL="cenovePonuky", CP_PROF="cpProfiles";
+/* oddelenie ponuky = segment zo Zappisu podľa prvej služby v ponuke */
+const SVC_DEPT={hp:"ad", nd:"nad", tl:"nad", ts:"tlac"};
+const DEPT_NAME={ad:"Adresné", nad:"Neadresné", tlac:"Tlač", baliky:"Balíky", digital:"Digitálne", zelena:"Zelená pošta"};
+function quoteDept(q){ const f=(q.services||[]).find(s=>s.on); return SVC_DEPT[f?.key]||"ad"; }
+
 const Store = {
-  db:null, uid:null, mode:"local",
+  mode:"cloud", uid:null, me:null, m:null, auth:null, db:null,
+  get seesAll(){ return ["admin","sef"].includes(this.me?.role); },
+  get isAdmin(){ return this.me?.role==="admin"; },
   async init(){
-    try{
-      const [db,user] = await Promise.all([claude.use("db"), claude.use("user")]);
-      if(db && user){
-        const uid = await user.id();
-        if(uid){ this.db=db; this.uid=uid; this.mode="cloud"; this.user=user; }
-      }
-      this.downloads = await claude.use("downloads");
-    }catch(e){ /* stays local */ }
+    const [appM,authM,fsM]=await Promise.all([
+      import(`https://www.gstatic.com/firebasejs/${FBV}/firebase-app.js`),
+      import(`https://www.gstatic.com/firebasejs/${FBV}/firebase-auth.js`),
+      import(`https://www.gstatic.com/firebasejs/${FBV}/firebase-firestore.js`)]);
+    this.m={...authM,...fsM};
+    const app=appM.initializeApp(firebaseConfig);
+    this.auth=authM.getAuth(app); this.db=fsM.getFirestore(app);
   },
-  base(){ return "data/users/"+this.uid; },
+  onUser(cb){ this.m.onAuthStateChanged(this.auth, cb); },
+  googleLogin(){ return this.m.signInWithPopup(this.auth, new this.m.GoogleAuthProvider()); },
+  emailLogin(e,p){ return this.m.signInWithEmailAndPassword(this.auth, e, p); },
+  logout(){ return this.m.signOut(this.auth); },
+  /* používateľ musí mať záznam v Zappise (kolekcia users) – tam je rola a segmenty */
+  async loadMe(u){
+    const {doc,getDoc}=this.m; const snap=await getDoc(doc(this.db,"users",u.uid));
+    if(!snap.exists()) return null;
+    const d=snap.data(); this.uid=u.uid;
+    this.me={uid:u.uid, email:(u.email||"").toLowerCase(), name:d.name||u.displayName||u.email, role:d.role||"obchodnik", segments:d.segments||[]};
+    return this.me;
+  },
   lsGet(k){ try{ return JSON.parse(localStorage.getItem("cp:"+k)||"null"); }catch(e){ return null; } },
   lsSet(k,v){ try{ localStorage.setItem("cp:"+k, JSON.stringify(v)); }catch(e){} },
-  async getProfile(){
-    if(this.mode==="cloud"){ const s=await this.db.doc(this.base()+"/profile").get(); return s.exists? s.data(): null; }
-    return this.lsGet("profile");
-  },
-  async setProfile(p){
-    if(this.mode==="cloud") return this.db.doc(this.base()+"/profile").set(p);
-    this.lsSet("profile",p);
-  },
-  qcol(){ return this.db.doc(this.base()+"/profile").collection("quotes"); },
+  async getProfile(){ const {doc,getDoc}=this.m; const s=await getDoc(doc(this.db,CP_PROF,this.uid)); return s.exists()? s.data(): null; },
+  async setProfile(p){ const {doc,setDoc}=this.m; return setDoc(doc(this.db,CP_PROF,this.uid), JSON.parse(JSON.stringify(p))); },
   async listQuotes(){
-    if(this.mode==="cloud"){ const s=await this.qcol().get(); return s.docs.map(d=>d.data()); }
-    return Object.values(this.lsGet("quotes")||{});
+    const {collection,query,where,getDocs}=this.m, col=collection(this.db,CP_COL), out=new Map();
+    const qs = this.seesAll ? [col] : [query(col, where("ownerUid","==",this.uid))];
+    const segs=(this.me.segments||[]).slice(0,30);
+    if(!this.seesAll && segs.length) qs.push(query(col, where("dept","in",segs)));
+    for(const q of qs){ const snap=await getDocs(q); snap.forEach(d=>out.set(d.id,d.data())); }
+    return [...out.values()];
   },
-  async saveQuote(q){
-    if(this.mode==="cloud") return this.qcol().doc(q.id).set(q);
-    const all=this.lsGet("quotes")||{}; all[q.id]=q; this.lsSet("quotes",all);
+  /* uloženie s kontrolou súbežnej úpravy: ak ponuku medzitým uložil niekto iný, vráti konflikt */
+  async saveQuote(q, force){
+    const {doc,runTransaction}=this.m, ref=doc(this.db,CP_COL,q.id), me=this.me;
+    return runTransaction(this.db, async tx=>{
+      const snap=await tx.get(ref), old=snap.exists()? snap.data(): null;
+      if(old && !force && (old.version||0)!==(q.version||0)){
+        const e=new Error("conflict"); e.code="conflict"; e.by=old.updatedByName; e.at=old.updatedAt; throw e; }
+      const now=new Date().toISOString();
+      const data=JSON.parse(JSON.stringify(Object.assign({}, q, {
+        ownerUid: old? old.ownerUid : me.uid, ownerName: old? old.ownerName : me.name,
+        createdAt: old? old.createdAt : now, dept: quoteDept(q),
+        updatedAt: now, updatedByUid: me.uid, updatedByName: me.name, version:(old?.version||0)+1 })));
+      tx.set(ref, data); return data;
+    });
   },
-  async deleteQuote(id){
-    if(this.mode==="cloud") return this.qcol().doc(id).delete();
-    const all=this.lsGet("quotes")||{}; delete all[id]; this.lsSet("quotes",all);
-  }
+  async deleteQuote(id){ const {doc,deleteDoc}=this.m; return deleteDoc(doc(this.db,CP_COL,id)); }
 };
 
 /* ════════════════ stav ════════════════ */
@@ -941,6 +1051,17 @@ function newQuote(keys=["hp"]){
 }
 function blankInv(){ const d=new Date(); d.setDate(d.getDate()+7); return {pct:"100", vat:"23", issued:todayISO(), due:d.toISOString().slice(0,10), pay:"prevodom", material:"", block:"", term:"", text:""}; }
 const svcDef = k => SERVICES.find(s=>s.key===k);
+/* distribučné cykly (Hromadná pošta) – predvolené texty */
+const CYCLES_DEF={d1:"štvrtok", d2:"piatok", d3:"piatok – pondelok",
+  note:"Doručovanie sa spravidla uskutočňuje od piatka do pondelka. Ak platný harmonogram distribučných cyklov na dané obdobie určuje iné termíny, riadime sa ním."};
+const CYCLE_STEPS=[
+  {k:"d1", t:"Globálna doprava", s:"Preprava na naše pobočky po celom Slovensku.",
+   i:'<path d="M3 7h11v9H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/>'},
+  {k:"d2", t:"Lokálny rozvoz", s:"Rozvoz k našim doručovateľom v regiónoch.",
+   i:'<circle cx="12" cy="5" r="2.2"/><circle cx="5" cy="18" r="2.2"/><circle cx="19" cy="18" r="2.2"/><path d="M11 7l-5 9M13 7l5 9M7.5 18h9"/>'},
+  {k:"d3", t:"Doručovanie", s:"Priamo do schránok adresátov.",
+   i:'<path d="M4 11a4 4 0 0 1 8 0v8H4z"/><path d="M8 7h8a4 4 0 0 1 4 4v8h-8"/><path d="M15 11V4h3"/>'}
+];
 /* štatutárni zástupcovia Cromwell a.s. – do ponuky sa vyberajú najviac dvaja */
 const STATUTARI=[
   {id:"mynar",    name:"Slávek Mynář",             role:"Predseda predstavenstva"},
@@ -1013,6 +1134,7 @@ function renderForm(){
   Q.services.forEach((s,i)=>{
     if(!s.on) return;
     normCols(s);
+    if(svcDef(s.key).cycles && !s.cycles) s.cycles=clone(CYCLES_DEF);
     const d=svcDef(s.key), tot=svcTotal(s);
     h += `<div class="card svc ${s.open?"":"closed"}"><h3 data-fold="${i}">${esc(d.name)} <small>${isNaN(tot)?"":fmtSum(tot)}</small><span class="chev">▾</span></h3><div class="body">
       ${(d.addons||[]).map(a=>{ const on=(s.addons||[]).includes(a.id); return `<button class="add" style="margin-top:8px;${on?"color:var(--warn)":""}" data-addon="${i}.${a.id}">${on?"− Odobrať":"+ Pridať"}: ${esc(a.label)}</button>`; }).join("")}
@@ -1047,6 +1169,10 @@ function renderForm(){
       <p class="hint" style="margin-top:6px">Ak do množstva napíšete rozpätie (napr. 100 000 – 149 999), riadok sa zobrazí ako cenník bez súčtu. Pri pridávaní riadka alebo stĺpca si v rozbaľovacom zozname vyberte, kam sa má vložiť. Umiestnenie stĺpca v PDF zmeníte aj neskôr v políčku pri jeho názve.</p>
 
 
+      ${d.cycles?`<div class="sub" data-sec="cycles-${s.key}">Distribučné cykly</div>
+      <label class="totTog"><input type="checkbox" data-cyctog="${i}" ${s.showCycles?"checked":""}> Zobraziť v ponuke informáciu o distribučných cykloch</label>
+      ${s.showCycles?`<div class="grid3" style="margin-top:8px">${CYCLE_STEPS.map(c=>field(c.t,"services."+i+".cycles."+c.k)).join("")}</div>
+        ${field("Poznámka pod cyklami","services."+i+".cycles.note",{area:1,rows:3})}`:""}`:""}
       <div class="sub" data-sec="texts-${s.key}">Texty</div>
       ${field("Úvod","services."+i+".intro",{area:1,rows:3})}
       <p class="hint">Tip: text medzi dvoma hviezdičkami **takto** bude v PDF tučný.</p>
@@ -1109,6 +1235,8 @@ function specWide(spec){ // dlhé hodnoty cez celú šírku, osamotená krátka 
   spec.forEach((r,i)=>{ let w=W[i]; if(!w && col===0 && (i===spec.length-1 || W[i+1])) w=true; out.push([r,w]); col = w?0:(col+1)%2; });
   return out;
 }
+/* údaje obchodníka v ponuke: pri cudzej ponuke ostáva autor, pri vlastnej aktuálny profil */
+function quoteProfile(){ return (Q && Q.author && Q.ownerUid && Q.ownerUid!==Store.uid) ? Object.assign(blankProfile(),Q.author) : profile; }
 function fullName(p){ return [p.title,p.first,p.last].filter(Boolean).join(" "); }
 
 /* dlhé názvy položiek: po kliknutí sa pole roztiahne na celý riadok a zalomí text */
@@ -1132,7 +1260,7 @@ $("#form").addEventListener("input", e=>{
   }
   schedulePreview();
 });
-$("#form").addEventListener("change", e=>{ { const m=(e.target.dataset.p||"").match(/^services\.(\d+)\.rows\.\d+\.qty$/); if(m){ if(checkFee(Q.services[+m[1]])) setTimeout(()=>{ renderForm(); renderPreview(); },0); return; } } if((e.target.dataset.p||"").startsWith("inv.")){ renderPreview(); } if(e.target.dataset.colposset){ const [i,k]=e.target.dataset.colposset.split(".").map(Number); Q.services[i].colPos[k]=e.target.value; dirty=true; renderPreview(); return; } if(e.target.dataset.rowpos!=null||e.target.dataset.colpos!=null||e.target.dataset.specpos!=null) return; if(e.target.dataset.tottog!=null){ Q.services[+e.target.dataset.tottog].showTotal=e.target.checked; dirty=true; renderPreview(); return; } if(e.target.dataset.staton!=null){ Q.stat.on=e.target.checked; dirty=true; renderAll(); return; } if(e.target.dataset.statid!=null){ const id=e.target.dataset.statid, a=Q.stat.ids||(Q.stat.ids=[]); if(e.target.checked){ if(!a.includes(id) && a.length<2) a.push(id); } else Q.stat.ids=a.filter(x=>x!==id); dirty=true; renderAll(); return; } if(e.target.dataset.vattog!=null){ Q.services[+e.target.dataset.vattog].showVatNote=e.target.checked; dirty=true; renderPreview(); return; } if(e.target.dataset.sumtog!=null){ Q.services[+e.target.dataset.sumtog].showSumRow=e.target.checked; dirty=true; renderPreview(); return; } if(/\.cols\./.test(e.target.dataset.p||"")){ renderAll(); return; } if(e.target.tagName==="SELECT"){ set(e.target.dataset.p,e.target.value); const m=(e.target.dataset.p||"").match(/^services\.(\d+)\.rows\.(\d+)\.unit$/); if(m) derive(Q.services[+m[1]].rows[+m[2]]); dirty=true; renderAll(); } });
+$("#form").addEventListener("change", e=>{ { const m=(e.target.dataset.p||"").match(/^services\.(\d+)\.rows\.\d+\.qty$/); if(m){ if(checkFee(Q.services[+m[1]])) setTimeout(()=>{ renderForm(); renderPreview(); },0); return; } } if((e.target.dataset.p||"").startsWith("inv.")){ renderPreview(); } if(e.target.dataset.colposset){ const [i,k]=e.target.dataset.colposset.split(".").map(Number); Q.services[i].colPos[k]=e.target.value; dirty=true; renderPreview(); return; } if(e.target.dataset.rowpos!=null||e.target.dataset.colpos!=null||e.target.dataset.specpos!=null) return; if(e.target.dataset.tottog!=null){ Q.services[+e.target.dataset.tottog].showTotal=e.target.checked; dirty=true; renderPreview(); return; } if(e.target.dataset.cyctog!=null){ const sv=Q.services[+e.target.dataset.cyctog]; sv.showCycles=e.target.checked; if(!sv.cycles) sv.cycles=clone(CYCLES_DEF); dirty=true; renderAll(); return; } if(e.target.dataset.staton!=null){ Q.stat.on=e.target.checked; dirty=true; renderAll(); return; } if(e.target.dataset.statid!=null){ const id=e.target.dataset.statid, a=Q.stat.ids||(Q.stat.ids=[]); if(e.target.checked){ if(!a.includes(id) && a.length<2) a.push(id); } else Q.stat.ids=a.filter(x=>x!==id); dirty=true; renderAll(); return; } if(e.target.dataset.vattog!=null){ Q.services[+e.target.dataset.vattog].showVatNote=e.target.checked; dirty=true; renderPreview(); return; } if(e.target.dataset.sumtog!=null){ Q.services[+e.target.dataset.sumtog].showSumRow=e.target.checked; dirty=true; renderPreview(); return; } if(/\.cols\./.test(e.target.dataset.p||"")){ renderAll(); return; } if(e.target.tagName==="SELECT"){ set(e.target.dataset.p,e.target.value); const m=(e.target.dataset.p||"").match(/^services\.(\d+)\.rows\.(\d+)\.unit$/); if(m) derive(Q.services[+m[1]].rows[+m[2]]); dirty=true; renderAll(); } });
 $("#form").addEventListener("click", e=>{
   const t=e.target.closest("[data-tog],[data-fold],[data-addrow],[data-delrow],[data-addspec],[data-delspec],[data-go],[data-addon],[data-addcol],[data-delcol],[data-tstyle],[data-mvspec],[data-layout],[data-invshow],[data-invpdf],[data-objshow],[data-objpdf],[data-addtable],[data-invedit],[data-invreset],[data-invadd],[data-invdel]"); if(!t) return;
   e.preventDefault();
@@ -1190,7 +1318,7 @@ const lines = t => String(t||"").split("\n").map(s=>s.trim()).filter(Boolean);
 function pageHeader(sub){ return `<div class="hdr"><div class="mk"><img src="${IMG_WORDMARK}" alt="Cromwell"></div><div class="ttl"><h1>CENOVÁ PONUKA</h1><p>${esc(sub)}</p></div></div>`; }
 
 function buildPages(){
-  const act=activeSvcs(), P=profile, c=Q.client;
+  const act=activeSvcs(), P=quoteProfile(), c=Q.client;
   const subtitle = act.map(svcTitle).join(" + ");
   const coverOn = new Set(act.map(s=>svcDef(s.key).cover));
   act.forEach(s=>(s.addons||[]).forEach(id=>{ const a=(svcDef(s.key).addons||[]).find(x=>x.id===id); if(a) coverOn.add(a.cover); }));
@@ -1288,6 +1416,17 @@ function buildPages(){
       });
     }
 
+    if(d.cycles && s.showCycles){ const cy=Object.assign(clone(CYCLES_DEF), s.cycles||{});
+      const W=678,H=64,T=18,G=4,x1=230,x2=456, col=["#8FA0E6","#5F76D8","#3552CC"], tx=[20,x1+G+T+14,x2+G+T+14];
+      const poly=[`0,0 ${x1-T},0 ${x1},${H/2} ${x1-T},${H} 0,${H}`,
+        `${x1+G},0 ${x2-T},0 ${x2},${H/2} ${x2-T},${H} ${x1+G},${H} ${x1+G+T},${H/2}`,
+        `${x2+G},0 ${W},0 ${W},${H} ${x2+G},${H} ${x2+G+T},${H/2}`];
+      blocks.push(`<div class="block cycBlock" data-anchor="cycles-${s.key}">
+        <div class="cenyHead"><span class="pill">DISTRIBUČNÉ CYKLY</span><span class="meta">Od odovzdania po schránku adresáta</span></div>
+        <div class="chev"><svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><defs><clipPath id="chevClip"><rect width="${W}" height="${H}" rx="5"/></clipPath></defs><g clip-path="url(#chevClip)">${poly.map((p,n)=>`<polygon points="${p}" fill="${col[n]}"/>`).join("")}</g></svg>
+          ${CYCLE_STEPS.map((c,n)=>`<div class="chevTx" style="left:${tx[n]}px"><span>${c.t}</span><b>${esc(cy[c.k]||"—")}</b></div>`).join("")}</div>
+        ${cy.note&&cy.note.trim()?`<div class="cycNote2">${rtp(cy.note)}</div>`:""}
+      </div>`); }
     if(cond.length && MOD) blocks.push(`<div class="block condBlock condModern" data-anchor="cond-${s.key}">
         <img class="photoImg" src="${PHOTO_S(d.photo)}" width="170" height="134" style="width:170px;height:134px" alt="">
         <div><div class="condTtl">Obchodné podmienky</div><ul class="doc small">${liHTML(s.conditions)}</ul></div></div>`);
@@ -1450,7 +1589,7 @@ function invRows(){
   return out;
 }
 function buildInvoice(kind){ const OBJ = kind==="obj";
-  const P=profile, c=Q.client, I=Object.assign(blankInv(), Q.inv||{});
+  const P=quoteProfile(), c=Q.client, I=Object.assign(blankInv(), Q.inv||{});
   const pct=(num(I.pct)||0)/100, vat=(num(I.vat)||0)/100;
   const rows=invRows(), qnum=Q.number||nextNumber(), znum=(OBJ?"OBJ-":"ZF-")+qnum;
   const r2=n=>Math.round(n*100)/100;
@@ -1523,18 +1662,29 @@ async function makePdf(mode){ mode = (mode==="inv"||mode==="obj")?mode:"quote";
 }
 
 /* ════════════════ ukladanie ════════════════ */
-async function saveQuote(silent){
-  if(!profile.first){ toast("Najprv vyplňte svoj profil."); show("profile"); return; }
+async function saveQuote(silent, force){
+  if(!profile.first){ toast("Najprv vyplňte svoj profil."); show("profile"); return false; }
   try{
     if(!Q.number){ Q.number=nextNumber(); profile.seq=(profile.seq||0)+1; await Store.setProfile(profile); }
-    Q.saved=true; Q.updatedAt=new Date().toISOString();
+    if(!Q.ownerUid || Q.ownerUid===Store.uid) Q.author=clone(profile);
+    Q.saved=true;
     const act=activeSvcs();
     Q.summary={client:Q.client.name, services:act.map(s=>svcDef(s.key).name), total:act.map(svcTotal).filter(v=>!isNaN(v)).reduce((a,b)=>a+b,0)};
-    await Store.saveQuote(clone(Q)); dirty=false;
+    const saved=await Store.saveQuote(clone(Q), force);
+    Object.assign(Q,{version:saved.version, ownerUid:saved.ownerUid, ownerName:saved.ownerName, createdAt:saved.createdAt, updatedAt:saved.updatedAt, updatedByName:saved.updatedByName, dept:saved.dept});
+    dirty=false;
     if(!silent) toast("Ponuka "+Q.number+" je uložená.");
-    renderForm();
-  }catch(e){ console.error(e); toast("Uloženie zlyhalo — skúste to znova."); }
+    renderForm(); return true;
+  }catch(e){
+    if(e.code==="conflict"){
+      const kedy=e.at? new Date(e.at).toLocaleString("sk-SK",{day:"numeric",month:"numeric",hour:"2-digit",minute:"2-digit"}):"";
+      if(confirm(`Ponuku medzitým upravil(a) ${e.by||"kolega"}${kedy?" ("+kedy+")":""}.\n\nOK = prepísať jeho/jej zmeny vašimi\nZrušiť = neukladať (ponuku potom otvorte znova z Mojich ponúk)`)) return saveQuote(silent,true);
+      toast("Neuložené – ponuku medzitým zmenil niekto iný.",4000); return false;
+    }
+    console.error(e); toast(e.code==="permission-denied"?"Na uloženie tejto ponuky nemáte oprávnenie.":"Uloženie zlyhalo — skúste to znova."); return false;
+  }
 }
+
 
 /* ════════════════ zoznam ════════════════ */
 let allQuotes=[];
@@ -1544,24 +1694,36 @@ async function renderList(){
   catch(e){ allQuotes=[]; }
   drawList();
 }
+function fmtStamp(iso){ if(!iso) return ""; const d=new Date(iso); return d.toLocaleDateString("sk-SK")+" "+d.toLocaleTimeString("sk-SK",{hour:"2-digit",minute:"2-digit"}); }
+async function importLocal(){
+  const loc=Object.values(Store.lsGet("quotes")||{}); if(!loc.length) return;
+  if(!confirm(`Nahrať ${loc.length} ponúk uložených doteraz v tomto prehliadači do spoločného úložiska?`)) return;
+  let ok=0; for(const q of loc){ try{ const qq=migrate(clone(q)); if(!qq.author) qq.author=clone(profile); await Store.saveQuote(qq,true); ok++; }catch(e){ console.warn(e); } }
+  if(ok===loc.length) Store.lsSet("quotes",{});
+  toast(`Nahraných ${ok} z ${loc.length} ponúk.`); renderList();
+}
 function drawList(){
   const q=$("#qSearch").value.trim().toLowerCase();
   const list=allQuotes.filter(x=>!q || (x.number||"").toLowerCase().includes(q) || (x.client?.name||"").toLowerCase().includes(q));
   const box=$("#qList");
+  const loc=Object.keys(Store.lsGet("quotes")||{}).length;
+  $("#qImport").innerHTML = loc? `<div class="warnBox" style="display:flex;justify-content:space-between;align-items:center;gap:10px">V tomto prehliadači máte ${loc} ponúk uložených ešte po starom. <button class="btn primary" style="flex:0 0 auto" id="bImport">Nahrať do úložiska</button></div>`:"";
   if(!list.length){ box.innerHTML=`<div class="empty">${allQuotes.length?"Nič sa nenašlo.":"Zatiaľ nemáte uloženú žiadnu ponuku."}</div>`; return; }
   box.innerHTML=list.map(x=>`<div class="qitem">
     <div><div class="t">${esc(x.client?.name||"Bez klienta")}</div><div class="m">${esc(x.number)} · ${esc(fmtDate(x.date))}${x.summary?.total?" · "+fmtSum(x.summary.total):""}</div>
-    <div class="chips">${(x.summary?.services||[]).map(s=>`<span class="chip">${esc(s)}</span>`).join("")}</div></div>
-    <div class="acts"><button class="btn" data-open="${x.id}">Otvoriť</button><button class="btn" data-copy="${x.id}">Kópia</button><button class="btn" data-del="${x.id}" aria-label="Zmazať">Zmazať</button></div>
+    <div class="m">Vytvoril(a): ${esc(x.ownerName||"—")}${x.updatedByName?` · naposledy upravil(a): ${esc(x.updatedByName)}, ${esc(fmtStamp(x.updatedAt))}`:""}</div>
+    <div class="chips">${(x.summary?.services||[]).map(s=>`<span class="chip">${esc(s)}</span>`).join("")}${x.dept?`<span class="chip dept">${esc(DEPT_NAME[x.dept]||x.dept)}</span>`:""}</div></div>
+    <div class="acts"><button class="btn" data-open="${x.id}">Otvoriť</button><button class="btn" data-copy="${x.id}">Kópia</button>${(x.ownerUid===Store.uid||Store.isAdmin)?`<button class="btn" data-del="${x.id}" aria-label="Zmazať">Zmazať</button>`:""}</div>
   </div>`).join("");
 }
 $("#qSearch").addEventListener("input",drawList);
+$("#qImport").addEventListener("click",e=>{ if(e.target.id==="bImport") importLocal(); });
 $("#qList").addEventListener("click", async e=>{
   const b=e.target.closest("button"); if(!b) return;
   const find=id=>allQuotes.find(x=>x.id===id);
   if(b.dataset.open){ if(dirty && !confirm("Neuložené zmeny v aktuálnej ponuke sa stratia. Pokračovať?")) return; Q=migrate(clone(find(b.dataset.open))); dirty=false; show("editor"); }
-  if(b.dataset.copy){ const src=clone(find(b.dataset.copy)); Object.assign(src,{id:newQuote().id, number:null, saved:false, date:todayISO()}); src.client={name:"",address:"",person:"",position:"",phone:"",email:""}; src.inv=blankInv(); Q=migrate(src); dirty=true; show("editor"); toast("Kópia pripravená — doplňte klienta."); }
-  if(b.dataset.del){ if(!confirm("Naozaj zmazať ponuku "+find(b.dataset.del).number+"?")) return; await Store.deleteQuote(b.dataset.del); renderList(); }
+  if(b.dataset.copy){ const src=clone(find(b.dataset.copy)); Object.assign(src,{id:newQuote().id, number:null, saved:false, date:todayISO()}); ["version","ownerUid","ownerName","createdAt","updatedAt","updatedByUid","updatedByName","author","dept"].forEach(k=>delete src[k]); src.client={name:"",address:"",person:"",position:"",phone:"",email:""}; src.inv=blankInv(); Q=migrate(src); dirty=true; show("editor"); toast("Kópia pripravená — doplňte klienta."); }
+  if(b.dataset.del){ if(!confirm("Naozaj zmazať ponuku "+find(b.dataset.del).number+"?")) return; try{ await Store.deleteQuote(b.dataset.del); }catch(err){ toast("Túto ponuku môže zmazať len jej autor."); } renderList(); }
 });
 function migrate(q){ q.inv=Object.assign(blankInv(), q.inv||{}); q.stat=Object.assign({on:false,ids:[],text:""}, q.stat||{}); // doplní služby pridané neskôr do konfigurácie
   SERVICES.forEach(s=>{ if(!q.services.find(x=>x.key===s.key)){ const n=newQuote().services.find(x=>x.key===s.key); n.on=false; q.services.push(n); } });
@@ -1688,18 +1850,46 @@ $("#form").addEventListener("scroll", ()=>{ if(Date.now()-(rowMenu.openedAt||0)>
   rz.addEventListener("dblclick",()=>{ root.style.removeProperty("--formW"); try{ localStorage.removeItem("cp:formW"); }catch(e){} dispatchEvent(new Event("resize")); });
 })();
 
+/* ════════════════ prihlásenie ════════════════ */
+function loginScreen(msg){
+  const el=$("#login"); el.hidden=false;
+  $("#loginMsg").textContent=msg||"";
+}
+function loginErr(e){
+  const c=e?.code||"";
+  return c.includes("wrong-password")||c.includes("invalid-credential")||c.includes("user-not-found") ? "Nesprávny e-mail alebo heslo."
+       : c.includes("popup-closed")||c.includes("cancelled-popup") ? ""
+       : c.includes("unauthorized-domain") ? "Táto adresa nie je povolená vo Firebase (Authorized domains)."
+       : c.includes("too-many-requests") ? "Príliš veľa pokusov, skúste to o chvíľu." : "Prihlásenie zlyhalo ("+c+").";
+}
+$("#lGoogle").addEventListener("click", async ()=>{ $("#loginMsg").textContent=""; try{ await Store.googleLogin(); }catch(e){ $("#loginMsg").textContent=loginErr(e); } });
+$("#lForm").addEventListener("submit", async e=>{ e.preventDefault(); $("#loginMsg").textContent="";
+  try{ await Store.emailLogin($("#lEmail").value.trim(), $("#lPass").value); }catch(err){ $("#loginMsg").textContent=loginErr(err); } });
+$("#bLogout").addEventListener("click", async ()=>{ if(dirty && !confirm("Neuložené zmeny sa stratia. Odhlásiť sa?")) return; dirty=false; await Store.logout(); location.reload(); });
+
 /* ════════════════ štart ════════════════ */
 (async function start(){
   profile = blankProfile(); Q = newQuote(); renderAll();
   makeBadge().then(()=>{ if(previewMode==="quote") renderPreview(); });
-  await Store.init();
-  $("#storeMode").textContent = Store.mode==="cloud" ? "" : "· údaje sa ukladajú v tomto prehliadači";
-  try{ const p=await Store.getProfile(); if(p) profile=Object.assign(blankProfile(),p); }catch(e){}
-  if(!profile.first && Store.user){ // návrh z účtu, používateľ ho potvrdí uložením
-    try{ const me=await Store.user.me(); if(me?.name){ const [f,...l]=me.name.split(" "); profile.first=""; $("#pFirst").placeholder=f; $("#pLast").placeholder=l.join(" "); } if(me?.email) $("#pEmail").placeholder=me.email; }catch(e){}
-  }
-  updateWho();
-  if(!profile.first) show("profile"); else renderAll();
+  try{ await Store.init(); }
+  catch(e){ console.error(e); loginScreen("Nepodarilo sa pripojiť k úložisku. Skontrolujte internet a obnovte stránku."); $("#lBox").hidden=true; return; }
+  Store.onUser(async u=>{
+    if(!u){ loginScreen(); return; }
+    let me=null; try{ me=await Store.loadMe(u); }catch(e){ console.error(e); }
+    if(!me){ await Store.logout(); loginScreen("Tento účet nemá prístup. Prihláste sa údajmi, ktoré používate v Zappise (ak ste sa do Zappisu ešte nikdy neprihlásili, urobte to najprv tam)."); return; }
+    $("#login").hidden=true;
+    try{ const p=await Store.getProfile(); if(p) profile=Object.assign(blankProfile(),p); }catch(e){ console.warn(e); }
+    if(!profile.first){ // prvé prihlásenie: prevezme starý profil z prehliadača, inak meno zo Zappisu
+      const old=Store.lsGet("profile");
+      if(old && old.first) profile=Object.assign(blankProfile(),old);
+      else { const parts=(me.name||"").trim().split(/\s+/); profile.first=parts.shift()||""; profile.last=parts.join(" "); }
+      if(!profile.email) profile.email=me.email;
+      try{ await Store.setProfile(profile); }catch(e){ console.warn(e); }
+    }
+    $("#storeMode").textContent = "· "+me.name;
+    updateWho(); renderAll();
+    if(!profile.position || !profile.phone) { show("profile"); toast("Doplňte si prosím pozíciu a telefón – zobrazia sa v ponukách.",4500); }
+  });
 })();
 </script>
 </body>
