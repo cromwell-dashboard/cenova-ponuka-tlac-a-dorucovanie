@@ -679,6 +679,34 @@ table.prices:not(.iTbl) thead th:first-child{width:46%}
 .priceRow .mv:hover:not(:disabled){background:var(--bg); color:var(--blue)}
 
 .svc,.invCard{border-left:1px solid var(--line)!important}
+/* ── väčšie písmo a vzdušnejšie riadky v špecifikácii a cenách ── */
+.page .spec{font-size:11.6px!important; gap:6px 26px!important}
+.page .specList .sr{font-size:11.6px!important; padding:7px 0!important}
+.page table.prices:not(.iTbl){font-size:11.8px!important}
+.page table.prices:not(.iTbl) td{padding:9px 10px!important}
+.page table.prices:not(.iTbl) th{padding:8px 10px!important}
+.page.c1 .spec{gap:3px 26px!important} .page.c1 .specList .sr{padding:5px 0!important}
+.page.c1 table.prices:not(.iTbl) td{padding:6.5px 10px!important} .page.c1 table.prices:not(.iTbl) th{padding:6px 10px!important}
+.page.c2 .spec,.page.c2 .specList .sr{font-size:10.8px!important} .page.c2 .specList .sr{padding:3px 0!important}
+.page.c2 table.prices:not(.iTbl){font-size:10.8px!important}
+.page.c2 table.prices:not(.iTbl) td{padding:4.5px 10px!important} .page.c2 table.prices:not(.iTbl) th{padding:5px 10px!important}
+/* ── sivý rámček s prínosmi – kompaktnejší, výška podľa obsahu ── */
+.page .benRow{align-items:start!important}
+.page ul.sepList li{padding:0 0 7px 14px!important; margin-bottom:7px!important}
+.page .gbList{padding:16px 20px 14px 22px!important}
+/* ── štýl „Striedanie riadkov“ – tabuľka v karte, hlavička ako jemný pás, striedané riadky ── */
+.page .ts-modra{border:1px solid #E1E4EC; border-radius:5px!important; overflow:hidden; background:#fff}
+.page .ts-modra table.prices{border-collapse:collapse!important; margin:0}
+.page .ts-modra table.prices th{background:#F1F3F9!important; color:#3552CC!important; font-weight:600; font-size:9.6px; text-transform:uppercase; letter-spacing:.5px; border-bottom:2px solid #3552CC!important; border-radius:0!important}
+.page .ts-modra table.prices td{border-bottom:0!important}
+.page .ts-modra table.prices tbody tr:nth-child(even):not(.tot) td{background:#F4F5F8!important}
+.page .ts-modra table.prices tbody tr:nth-child(odd):not(.tot) td{background:#fff}
+.page .ts-modra table.prices tr.tot td{background:#fff!important; border-top:1.5px solid #3552CC!important; color:#3552CC}
+.page .ts-modra + .totCard{margin-top:10px}
+.page.c1 .gbList{padding:12px 18px 10px 20px!important} .page.c1 ul.sepList li{padding-bottom:5px!important; margin-bottom:5px!important} .page.c1 ul.dotList li{margin-bottom:6px} .page.c1 ul.dotList{margin-bottom:12px} .page.c1 .blueBox{margin-bottom:14px; padding:12px 18px 13px 24px} .page.c1 .h2doc.big{margin-bottom:12px}
+.page.c2 .gbList{padding:10px 16px 8px 18px!important} .page.c2 ul.sepList li{font-size:10.6px; padding-bottom:3px!important; margin-bottom:3px!important; line-height:1.35} .page.c2 ul.dotList li{font-size:10.6px; margin-bottom:4px; line-height:1.35} .page.c2 ul.dotList{margin-bottom:8px} .page.c2 .blueBox{margin-bottom:10px; padding:10px 16px 11px 22px; font-size:10.6px} .page.c2 .h2doc.big{margin-bottom:8px; font-size:14px} .page.c2 .introTxt{margin-bottom:8px}
+.bar .btn{padding:10px 12px; white-space:nowrap}
+.bar .btn.primary{flex:1 1 auto}
 .vlHead{margin:0 0 12px!important; font-size:15px!important}
 .listWide{max-width:1120px!important}
 .qFilters{display:grid; grid-template-columns:1fr 260px; gap:10px; margin-bottom:12px}
@@ -748,7 +776,8 @@ table.prices:not(.iTbl) thead th:first-child{width:46%}
       <div class="bar">
         <button class="btn" id="bNew" title="Začať novú ponuku">Nová</button>
         <button class="btn" id="bSave">Uložiť</button>
-        <button class="btn" id="bPrint" title="Ostré vektorové PDF cez tlač prehliadača – zvoľte Uložiť ako PDF">PDF HQ</button>
+        <button class="btn" id="bClose" title="Zavrieť ponuku bez uloženia a vrátiť sa do zoznamu ponúk">Zavrieť</button>
+        <button class="btn primary" id="bPrint" title="Ostré vektorové PDF cez tlač prehliadača – zvoľte Uložiť ako PDF">PDF HQ</button>
         <button class="btn primary" id="bPdf">Stiahnuť PDF</button>
       </div>
     </div>
@@ -1337,7 +1366,7 @@ function renderForm(){
   f.scrollTop = scroll;
   if(focP){ const el=f.querySelector(`[data-p="${focP}"]`); if(el){ el.focus({preventScroll:true}); try{ const n=el.value.length; el.setSelectionRange(n,n); }catch(e){} } }
 }
-const TSTYLES=[["karta","Karta"],["modra","Modrá hlavička"],["minimal","Minimal"]];
+const TSTYLES=[["karta","Karta"],["modra","Striedanie riadkov"],["minimal","Minimal"]];
 const COLPOS=[["name","za Položkou"],["qty","za Množstvom"],["price","za Cenou / j."],["total","na koniec"]];
 function normCols(s){ if(s.showSumRow===undefined) s.showSumRow = s.showTotal!==false; s.cols=s.cols||[]; s.colPos=s.colPos||[]; while(s.colPos.length<s.cols.length) s.colPos.push("name"); s.rows.forEach(r=>{ r.x=r.x||[]; while(r.x.length<s.cols.length) r.x.push(""); }); }
 function gridCols(s){ return "grid-template-columns:minmax(90px,1fr) "+s.cols.map(()=>"54px ").join("")+"52px 56px 52px 64px 16px 16px 16px 18px"; }
@@ -1564,7 +1593,7 @@ function buildPages(){
   const cl=lines(Q.closing);
   const shown = act.filter(s=>showSumRow(s)); const grand = shown.map(svcTotal).filter(v=>!isNaN(v));
   const fin=[];
-  if(act.length>1&&grand.length>1) fin.push(`<div class="block"><span class="pill">SÚHRN</span><div class="tblWrap ts-${Q.tableStyle||"minimal"}"><table class="prices"><tbody>${shown.map(s=>{const t=svcTotal(s); return isNaN(t)?"":`<tr><td>${esc(svcTitle(s))}</td><td class="n">${fmtSum(t)}</td></tr>`;}).join("")}<tr class="tot"><td>Spolu bez DPH</td><td class="n">${fmtSum(grand.reduce((a,b)=>a+b,0))}</td></tr></tbody></table></div></div>`);
+  if(act.length>1 && act.every(s=>showSumRow(s) && !isNaN(svcTotal(s)))) fin.push(`<div class="block"><span class="pill">SÚHRN</span><div class="tblWrap ts-${Q.tableStyle||"minimal"}"><table class="prices"><tbody>${shown.map(s=>{const t=svcTotal(s); return isNaN(t)?"":`<tr><td>${esc(svcTitle(s))}</td><td class="n">${fmtSum(t)}</td></tr>`;}).join("")}<tr class="tot"><td>Spolu bez DPH</td><td class="n">${fmtSum(grand.reduce((a,b)=>a+b,0))}</td></tr></tbody></table></div></div>`);
   fin.push(`<div class="block"><span class="pill" style="width:300px; text-align:center">REFERENCIE</span>
       <p style="margin:0 0 12px">Spoločnosť Cromwell a. s. dlhodobo zabezpečuje ${act.some(s=>s.key==="ts"||s.key==="tl")&&!act.some(s=>s.key==="hp"||s.key==="nd")?"tlačové a kompletizačné služby":"poštové, tlačové a doručovacie služby"} nielen pre týchto významných klientov:</p>
       <img class="refImg" src="${IMG_REFS[svcDef(act[0].key).refs]}" alt=""></div>`);
@@ -1918,6 +1947,7 @@ $("#bPrint").addEventListener("click", async ()=>{
   toast("V okne tlače zvoľte „Uložiť ako PDF“, okraje: Žiadne, a zapnite Grafiku pozadia.",6000);
   setTimeout(()=>{ try{ window.print(); }catch(e){ toast("Tlač nie je v tomto prostredí dostupná – otvorte generátor cez web link."); } },400);
 });
+$("#bClose").addEventListener("click",()=>{ if(dirty && !confirm("Ponuku ste zmenili a zmeny nie sú uložené.\n\nOK = zavrieť bez uloženia\nZrušiť = zostať v ponuke")) return; Q=newQuote(); dirty=false; renderAll(); show("list"); });
 $("#bNew").addEventListener("click",()=>{ if(dirty && !confirm("Neuložené zmeny sa stratia. Začať novú ponuku?")) return; Q=newQuote(); dirty=false; renderAll(); });
 addEventListener("beforeunload", e=>{ if(dirty){ e.preventDefault(); e.returnValue=""; } });
 
