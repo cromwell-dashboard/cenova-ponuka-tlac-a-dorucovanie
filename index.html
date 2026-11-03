@@ -566,7 +566,7 @@ ul.sepList li.gapB{margin-top:14px!important}
 .navSep{width:1px; align-self:stretch; margin:4px 2px; background:var(--line)}
 @media (max-width:980px){ .navSep{display:none} .nav button{font-size:12px; padding:7px 4px} }
 
-.sepRow{display:grid!important; grid-template-columns:auto 1fr 16px 18px!important; gap:6px!important; margin:10px 0 6px!important; padding-top:8px; border-top:1px dashed var(--line); align-items:center}
+.sepRow{display:grid!important; grid-template-columns:auto 1fr 16px 16px 16px 18px!important; gap:6px!important; margin:10px 0 6px!important; padding-top:8px; border-top:1px dashed var(--line); align-items:center}
 .sepTag{font-size:10.5px; font-weight:600; text-transform:uppercase; letter-spacing:.5px; color:var(--blue)}
 .sepCell{font-weight:600; color:var(--blue)!important}
 table.prices:not(.iTbl) thead th:first-child{width:46%}
@@ -660,6 +660,23 @@ table.prices:not(.iTbl) thead th:first-child{width:46%}
 .lOut{padding:6px 12px; font-size:12px}
 .chip.dept{background:#EFEFF0; color:#4A5068}
 @media print{ .login,.lOut{display:none!important} }
+</style>
+<style id="uiRound">
+/* štvorec s logom v hlavičke – zaoblené spodné rohy */
+.hdr .mk{border-radius:0 0 10px 10px!important}
+/* jednotné zaoblenie všetkých tlačidiel a polí v aplikácii */
+.logo .mark,.nav button,.pvTabs button,.btn,.tile,.add,.x,.mv,.search,.mobileSwitch button,.rowMenu button,.statItem,
+.fld input,.fld textarea,.fld select,.cell,.lCard button,.lCard input,.warnBox button,.qitem button,.priceRow .rm,.colChip{border-radius:8px!important}
+.nav,.pvTabs{border-radius:11px!important}
+/* výraznejšie okraje polí na vypĺňanie */
+.fld input,.fld textarea,.fld select,.cell,.search,.lCard input,.addWith select,.addInline select{border:1.5px solid #B9C0D4!important; background:#fff!important}
+.fld input:hover,.fld textarea:hover,.fld select:hover,.cell:hover,.search:hover{border-color:#8F98B6!important}
+.fld input:focus,.fld textarea:focus,.fld select:focus,.cell:focus,.search:focus,.lCard input:focus{border-color:var(--blue)!important; box-shadow:0 0 0 3px rgba(53,82,204,.15); outline:none}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .fld input,:root:not([data-theme="light"]) .fld textarea,:root:not([data-theme="light"]) .fld select,:root:not([data-theme="light"]) .cell,:root:not([data-theme="light"]) .search{background:var(--panel)!important;border-color:#47507A!important}}
+:root[data-theme="dark"] .fld input,:root[data-theme="dark"] .fld textarea,:root[data-theme="dark"] .fld select,:root[data-theme="dark"] .cell,:root[data-theme="dark"] .search{background:var(--panel)!important;border-color:#47507A!important}
+.priceRow .mv{width:16px; font-size:12px}
+.priceRow .mv:disabled,.specRow .mv:disabled{opacity:.25}
+.priceRow .mv:hover:not(:disabled){background:var(--bg); color:var(--blue)}
 </style>
 </head>
 <body>
@@ -970,11 +987,14 @@ const firebaseConfig = {
 const FBV="10.14.1";
 const CP_COL="cenovePonuky", CP_PROF="cpProfiles";
 /* oddelenie ponuky = segment zo Zappisu podľa prvej služby v ponuke */
-const SVC_DEPT={hp:"ad", nd:"nad", tl:"nad", ts:"tlac"};
+const SVC_DEPT={hp:"ad", nd:"nad", tl:"tlac", ts:"tlac"};
+const ADDON_DEPT={tlac:"tlac"};
 const DEPT_NAME={ad:"Adresné", nad:"Neadresné", tlac:"Tlač", baliky:"Balíky", digital:"Digitálne", zelena:"Zelená pošta"};
 function encQ(q){ (q.services||[]).forEach(s=>{ if(Array.isArray(s.spec)) s.spec=s.spec.map(r=>Array.isArray(r)?{k:r[0]??"",v:r[1]??"",a:r[2]??null}:r); }); return q; }
 function decQ(q){ (q.services||[]).forEach(s=>{ if(Array.isArray(s.spec)) s.spec=s.spec.map(r=>Array.isArray(r)?r:(r.a?[r.k,r.v,r.a]:[r.k,r.v])); }); return q; }
 function quoteDept(q){ const f=(q.services||[]).find(s=>s.on); return SVC_DEPT[f?.key]||"ad"; }
+/* všetky oddelenia, ktorých sa ponuka týka (každá zvolená služba + doplnky, napr. tlač pri hromadnej pošte) */
+function quoteDepts(q){ const d=new Set(); (q.services||[]).filter(s=>s.on).forEach(s=>{ if(SVC_DEPT[s.key]) d.add(SVC_DEPT[s.key]); (s.addons||[]).forEach(a=>{ if(ADDON_DEPT[a]) d.add(ADDON_DEPT[a]); }); }); if(!d.size) d.add(quoteDept(q)); return [...d]; }
 
 const Store = {
   mode:"cloud", uid:null, me:null, m:null, auth:null, db:null,
@@ -1010,12 +1030,22 @@ const Store = {
     const qs = this.seesAll ? [col] : [query(col, where("ownerUid","==",this.uid))];
     const segs=(this.me.segments||[]).slice(0,30);
     if(!this.seesAll && segs.length) qs.push(query(col, where("dept","in",segs)));
-    for(const q of qs){ const snap=await getDocs(q); snap.forEach(d=>out.set(d.id,decQ(d.data()))); }
+    if(!this.seesAll && segs.length) qs.push(query(col, where("depts","array-contains-any",segs.slice(0,10))));
+    let ok=0, err=null;
+    for(const q of qs){ try{ const snap=await getDocs(q); snap.forEach(d=>out.set(d.id,decQ(d.data()))); ok++; }catch(e){ console.warn("Zoznam ponúk – dopyt zlyhal:",e); err=e; } }
+    if(!ok && err) throw err;
     return [...out.values()];
   },
   /* uloženie s kontrolou súbežnej úpravy: ak ponuku medzitým uložil niekto iný, vráti konflikt */
   async saveQuote(q, force){
-    const {doc,runTransaction}=this.m, ref=doc(this.db,CP_COL,q.id), me=this.me;
+    const {doc,runTransaction,setDoc}=this.m, ref=doc(this.db,CP_COL,q.id), me=this.me;
+    if(!q.version && !q.ownerUid){
+      const now=new Date().toISOString();
+      const data=encQ(JSON.parse(JSON.stringify(Object.assign({}, q, {
+        ownerUid: me.uid, ownerName: me.name, createdAt: now, dept: quoteDept(q), depts: quoteDepts(q),
+        updatedAt: now, updatedByUid: me.uid, updatedByName: me.name, version:1 }))));
+      await setDoc(ref, data); return data;
+    }
     return runTransaction(this.db, async tx=>{
       const snap=await tx.get(ref), old=snap.exists()? snap.data(): null;
       if(old && !force && (old.version||0)!==(q.version||0)){
@@ -1023,7 +1053,7 @@ const Store = {
       const now=new Date().toISOString();
       const data=encQ(JSON.parse(JSON.stringify(Object.assign({}, q, {
         ownerUid: old? old.ownerUid : me.uid, ownerName: old? old.ownerName : me.name,
-        createdAt: old? old.createdAt : now, dept: quoteDept(q),
+        createdAt: old? old.createdAt : now, dept: quoteDept(q), depts: quoteDepts(q),
         updatedAt: now, updatedByUid: me.uid, updatedByName: me.name, version:(old?.version||0)+1 }))));
       tx.set(ref, data); return data;
     });
@@ -1153,15 +1183,15 @@ function renderForm(){
 
       <div class="sub" data-sec="prices-${s.key}">Ceny</div>
       ${s.cols.length?`<div class="colsEd">${s.cols.map((c,k)=>`<div class="colChip"><input class="cell" data-p="services.${i}.cols.${k}" value="${esc(c)}" placeholder="Názov stĺpca"><select class="cell posSel" data-colposset="${i}.${k}" title="Umiestnenie v PDF">${COLPOS.map(([v,l])=>`<option value="${v}" ${(s.colPos[k]||"name")===v?"selected":""}>${l}</option>`).join("")}</select><button class="x" data-delcol="${i}.${k}" aria-label="Odstrániť stĺpec">×</button></div>`).join("")}</div>`:""}
-      <div class="priceRow priceHead" style="${gridCols(s)}"><span>Položka</span>${s.cols.map(c=>`<span>${esc(c||"Stĺpec")}</span>`).join("")}<span>Množstvo</span><span>Jednotka</span><span>Cena / j.</span><span>Spolu</span><span></span><span></span></div>
-      ${s.rows.map((r,j)=> r.sep ? `<div class="priceRow sepRow"><span class="sepTag">Tabuľka</span><input class="cell sepCell" data-p="services.${i}.rows.${j}.name" value="${esc(r.name)}" placeholder="Názov tabuľky (napr. Tlač, Doručenie…)"><button class="rm" data-rowmenu="${i}.${j}" aria-label="Možnosti" title="Posunúť alebo presunúť">⋮</button><button class="x" data-delrow="${i}.${j}" aria-label="Odstrániť tabuľku" title="Odstráni len nadpis – riadky sa pripoja k predchádzajúcej tabuľke">×</button></div>` : `<div class="priceRow" style="${gridCols(s)}">
+      <div class="priceRow priceHead" style="${gridCols(s)}"><span>Položka</span>${s.cols.map(c=>`<span>${esc(c||"Stĺpec")}</span>`).join("")}<span>Množstvo</span><span>Jednotka</span><span>Cena / j.</span><span>Spolu</span><span></span><span></span><span></span><span></span></div>
+      ${s.rows.map((r,j)=> r.sep ? `<div class="priceRow sepRow"><span class="sepTag">Tabuľka</span><input class="cell sepCell" data-p="services.${i}.rows.${j}.name" value="${esc(r.name)}" placeholder="Názov tabuľky (napr. Tlač, Doručenie…)"><button class="mv" data-mvrow="${i}.${j}.-1" aria-label="Posunúť vyššie" title="Posunúť vyššie" ${j===0?"disabled":""}>↑</button><button class="mv" data-mvrow="${i}.${j}.1" aria-label="Posunúť nižšie" title="Posunúť nižšie" ${j===s.rows.length-1?"disabled":""}>↓</button><button class="rm" data-rowmenu="${i}.${j}" aria-label="Možnosti" title="Posunúť alebo presunúť">⋮</button><button class="x" data-delrow="${i}.${j}" aria-label="Odstrániť tabuľku" title="Odstráni len nadpis – riadky sa pripoja k predchádzajúcej tabuľke">×</button></div>` : `<div class="priceRow" style="${gridCols(s)}">
         <textarea class="cell nameCell ${r.fee?"feeCell":""}" data-p="services.${i}.rows.${j}.name" rows="1" wrap="off" placeholder="Názov položky" title="${esc(r.fee?"Pridané automaticky – náklad je nižší ako 5 000 ks. Krížikom ho môžete odstrániť.\n"+r.name:r.name)}">${esc(r.name)}</textarea>
         ${s.cols.map((c,k)=>`<input class="cell" data-p="services.${i}.rows.${j}.x.${k}" value="${esc(r.x[k]||"")}">`).join("")}
         <input class="cell" data-p="services.${i}.rows.${j}.qty" value="${esc(r.qty)}" placeholder="2 600" inputmode="decimal">
         <select class="cell unitSel" data-p="services.${i}.rows.${j}.unit">${["ks","1000 ks"].map(u=>`<option ${u===r.unit?"selected":""}>${u}</option>`).join("")}</select>
         <input class="cell" data-p="services.${i}.rows.${j}.price" value="${esc(r.price)}" placeholder="0,000" inputmode="decimal">
         <input class="cell sumCell" data-p="services.${i}.rows.${j}.sum" value="${esc(r.mode==="total"? (r.sum||"") : fmtIn(rowTotal(r),2))}" placeholder="spolu" inputmode="decimal" title="Cena spolu – ak ju zadáte, cena za jednotku sa dopočíta">
-        <button class="rm" data-rowmenu="${i}.${j}" aria-label="Možnosti riadka" title="Posunúť riadok alebo presunúť do inej služby">⋮</button><button class="x" data-delrow="${i}.${j}" aria-label="Odstrániť riadok">×</button></div>`).join("")}
+        <button class="mv" data-mvrow="${i}.${j}.-1" aria-label="Posunúť vyššie" title="Posunúť vyššie" ${j===0?"disabled":""}>↑</button><button class="mv" data-mvrow="${i}.${j}.1" aria-label="Posunúť nižšie" title="Posunúť nižšie" ${j===s.rows.length-1?"disabled":""}>↓</button><button class="rm" data-rowmenu="${i}.${j}" aria-label="Možnosti riadka" title="Posunúť riadok alebo presunúť do inej služby">⋮</button><button class="x" data-delrow="${i}.${j}" aria-label="Odstrániť riadok">×</button></div>`).join("")}
       <div class="addGrid">
         <div class="addWith"><button class="add" data-addrow="${i}">+ Pridať riadok</button>
           <select class="cell" data-rowpos="${i}" title="Kam vložiť nový riadok"><option value="end">na koniec</option><option value="-1">na začiatok</option>${s.rows.map((r,j)=>`<option value="${j}">za ${j+1}. ${esc((r.name||"riadok").slice(0,22))}</option>`).join("")}</select></div>
@@ -1236,7 +1266,7 @@ function renderForm(){
 const TSTYLES=[["karta","Karta"],["modra","Modrá hlavička"],["minimal","Minimal"]];
 const COLPOS=[["name","za Položkou"],["qty","za Množstvom"],["price","za Cenou / j."],["total","na koniec"]];
 function normCols(s){ if(s.showSumRow===undefined) s.showSumRow = s.showTotal!==false; s.cols=s.cols||[]; s.colPos=s.colPos||[]; while(s.colPos.length<s.cols.length) s.colPos.push("name"); s.rows.forEach(r=>{ r.x=r.x||[]; while(r.x.length<s.cols.length) r.x.push(""); }); }
-function gridCols(s){ return "grid-template-columns:minmax(90px,1fr) "+s.cols.map(()=>"54px ").join("")+"52px 56px 52px 64px 16px 18px"; }
+function gridCols(s){ return "grid-template-columns:minmax(90px,1fr) "+s.cols.map(()=>"54px ").join("")+"52px 56px 52px 64px 16px 16px 16px 18px"; }
 function specWide(spec){ // dlhé hodnoty cez celú šírku, osamotená krátka dlaždica sa roztiahne
   const W=spec.map(r=>((r[0]||"")+(r[1]||"")).length>62); const out=[]; let col=0;
   spec.forEach((r,i)=>{ let w=W[i]; if(!w && col===0 && (i===spec.length-1 || W[i+1])) w=true; out.push([r,w]); col = w?0:(col+1)%2; });
@@ -1269,7 +1299,7 @@ $("#form").addEventListener("input", e=>{
 });
 $("#form").addEventListener("change", e=>{ { const m=(e.target.dataset.p||"").match(/^services\.(\d+)\.rows\.\d+\.qty$/); if(m){ if(checkFee(Q.services[+m[1]])) setTimeout(()=>{ renderForm(); renderPreview(); },0); return; } } if((e.target.dataset.p||"").startsWith("inv.")){ renderPreview(); } if(e.target.dataset.colposset){ const [i,k]=e.target.dataset.colposset.split(".").map(Number); Q.services[i].colPos[k]=e.target.value; dirty=true; renderPreview(); return; } if(e.target.dataset.rowpos!=null||e.target.dataset.colpos!=null||e.target.dataset.specpos!=null) return; if(e.target.dataset.tottog!=null){ Q.services[+e.target.dataset.tottog].showTotal=e.target.checked; dirty=true; renderPreview(); return; } if(e.target.dataset.cyctog!=null){ const sv=Q.services[+e.target.dataset.cyctog]; sv.showCycles=e.target.checked; if(!sv.cycles) sv.cycles=clone(CYCLES_DEF); dirty=true; renderAll(); return; } if(e.target.dataset.staton!=null){ Q.stat.on=e.target.checked; dirty=true; renderAll(); return; } if(e.target.dataset.statid!=null){ const id=e.target.dataset.statid, a=Q.stat.ids||(Q.stat.ids=[]); if(e.target.checked){ if(!a.includes(id) && a.length<2) a.push(id); } else Q.stat.ids=a.filter(x=>x!==id); dirty=true; renderAll(); return; } if(e.target.dataset.vattog!=null){ Q.services[+e.target.dataset.vattog].showVatNote=e.target.checked; dirty=true; renderPreview(); return; } if(e.target.dataset.sumtog!=null){ Q.services[+e.target.dataset.sumtog].showSumRow=e.target.checked; dirty=true; renderPreview(); return; } if(/\.cols\./.test(e.target.dataset.p||"")){ renderAll(); return; } if(e.target.tagName==="SELECT"){ set(e.target.dataset.p,e.target.value); const m=(e.target.dataset.p||"").match(/^services\.(\d+)\.rows\.(\d+)\.unit$/); if(m) derive(Q.services[+m[1]].rows[+m[2]]); dirty=true; renderAll(); } });
 $("#form").addEventListener("click", e=>{
-  const t=e.target.closest("[data-tog],[data-fold],[data-addrow],[data-delrow],[data-addspec],[data-delspec],[data-go],[data-addon],[data-addcol],[data-delcol],[data-tstyle],[data-mvspec],[data-layout],[data-invshow],[data-invpdf],[data-objshow],[data-objpdf],[data-addtable],[data-invedit],[data-invreset],[data-invadd],[data-invdel]"); if(!t) return;
+  const t=e.target.closest("[data-tog],[data-fold],[data-addrow],[data-delrow],[data-addspec],[data-delspec],[data-go],[data-addon],[data-addcol],[data-delcol],[data-tstyle],[data-mvspec],[data-mvrow],[data-layout],[data-invshow],[data-invpdf],[data-objshow],[data-objpdf],[data-addtable],[data-invedit],[data-invreset],[data-invadd],[data-invdel]"); if(!t) return;
   e.preventDefault();
   if(t.dataset.go){ show(t.dataset.go); return; }
   if(t.dataset.invshow){ setPreviewMode("inv"); return; }
@@ -1294,6 +1324,7 @@ $("#form").addEventListener("click", e=>{
   if(t.dataset.delcol){ const [i,k]=t.dataset.delcol.split(".").map(Number); const sv=Q.services[i]; sv.cols.splice(k,1); (sv.colPos||[]).splice(k,1); sv.rows.forEach(r=>r.x&&r.x.splice(k,1)); }
   if(t.dataset.delrow){ const [i,j]=t.dataset.delrow.split(".").map(Number); if(Q.services[i].rows[j]?.fee) Q.services[i].feeDismissed=true; Q.services[i].rows.splice(j,1); }
   if(t.dataset.addspec!=null){ const i=+t.dataset.addspec, sv=Q.services[i]; const pos=document.querySelector(`[data-specpos="${i}"]`)?.value||"end"; if(pos==="end") sv.spec.push(["",""]); else sv.spec.splice(+pos+1,0,["",""]); }
+  if(t.dataset.mvrow){ const [i,j,d]=t.dataset.mvrow.split(".").map(Number), rw=Q.services[i].rows, k=j+d; if(k>=0&&k<rw.length){ [rw[j],rw[k]]=[rw[k],rw[j]]; } }
   if(t.dataset.mvspec){ const [i,j,d]=t.dataset.mvspec.split(".").map(Number), sp=Q.services[i].spec, k=j+d; if(k>=0&&k<sp.length){ [sp[j],sp[k]]=[sp[k],sp[j]]; } }
   if(t.dataset.delspec){ const [i,j]=t.dataset.delspec.split(".").map(Number); Q.services[i].spec.splice(j,1); }
   dirty=true; renderAll();
@@ -1678,7 +1709,7 @@ async function saveQuote(silent, force){
     const act=activeSvcs();
     Q.summary={client:Q.client.name, services:act.map(s=>svcDef(s.key).name), total:act.map(svcTotal).filter(v=>!isNaN(v)).reduce((a,b)=>a+b,0)};
     const saved=await Store.saveQuote(clone(Q), force);
-    Object.assign(Q,{version:saved.version, ownerUid:saved.ownerUid, ownerName:saved.ownerName, createdAt:saved.createdAt, updatedAt:saved.updatedAt, updatedByName:saved.updatedByName, dept:saved.dept});
+    Object.assign(Q,{version:saved.version, ownerUid:saved.ownerUid, ownerName:saved.ownerName, createdAt:saved.createdAt, updatedAt:saved.updatedAt, updatedByName:saved.updatedByName, dept:saved.dept, depts:saved.depts});
     dirty=false;
     if(!silent) toast("Ponuka "+Q.number+" je uložená.");
     renderForm(); return true;
@@ -1705,9 +1736,9 @@ function fmtStamp(iso){ if(!iso) return ""; const d=new Date(iso); return d.toLo
 async function importLocal(){
   const loc=Object.values(Store.lsGet("quotes")||{}); if(!loc.length) return;
   if(!confirm(`Nahrať ${loc.length} ponúk uložených doteraz v tomto prehliadači do spoločného úložiska?`)) return;
-  let ok=0; for(const q of loc){ try{ const qq=migrate(clone(q)); if(!qq.author) qq.author=clone(profile); await Store.saveQuote(qq,true); ok++; }catch(e){ console.warn(e); } }
+  let ok=0, last=null; for(const q of loc){ try{ const qq=migrate(clone(q)); if(!qq.author) qq.author=clone(profile); delete qq.version; delete qq.ownerUid; await Store.saveQuote(qq,true); ok++; }catch(e){ console.warn(e); last=e; } }
   if(ok===loc.length) Store.lsSet("quotes",{});
-  toast(`Nahraných ${ok} z ${loc.length} ponúk.`); renderList();
+  toast(`Nahraných ${ok} z ${loc.length} ponúk.`+(last?` Chyba: ${last.code||last.message}`:""),6000); renderList();
 }
 function drawList(){
   const q=$("#qSearch").value.trim().toLowerCase();
@@ -1719,7 +1750,7 @@ function drawList(){
   box.innerHTML=list.map(x=>`<div class="qitem">
     <div><div class="t">${esc(x.client?.name||"Bez klienta")}</div><div class="m">${esc(x.number)} · ${esc(fmtDate(x.date))}${x.summary?.total?" · "+fmtSum(x.summary.total):""}</div>
     <div class="m">Vytvoril(a): ${esc(x.ownerName||"—")}${x.updatedByName?` · naposledy upravil(a): ${esc(x.updatedByName)}, ${esc(fmtStamp(x.updatedAt))}`:""}</div>
-    <div class="chips">${(x.summary?.services||[]).map(s=>`<span class="chip">${esc(s)}</span>`).join("")}${x.dept?`<span class="chip dept">${esc(DEPT_NAME[x.dept]||x.dept)}</span>`:""}</div></div>
+    <div class="chips">${(x.summary?.services||[]).map(s=>`<span class="chip">${esc(s)}</span>`).join("")}${(x.depts||(x.dept?[x.dept]:[])).map(d=>`<span class="chip dept">${esc(DEPT_NAME[d]||d)}</span>`).join("")}</div></div>
     <div class="acts"><button class="btn" data-open="${x.id}">Otvoriť</button><button class="btn" data-copy="${x.id}">Kópia</button>${(x.ownerUid===Store.uid||Store.isAdmin)?`<button class="btn" data-del="${x.id}" aria-label="Zmazať">Zmazať</button>`:""}</div>
   </div>`).join("");
 }
@@ -1729,7 +1760,7 @@ $("#qList").addEventListener("click", async e=>{
   const b=e.target.closest("button"); if(!b) return;
   const find=id=>allQuotes.find(x=>x.id===id);
   if(b.dataset.open){ if(dirty && !confirm("Neuložené zmeny v aktuálnej ponuke sa stratia. Pokračovať?")) return; Q=migrate(clone(find(b.dataset.open))); dirty=false; show("editor"); }
-  if(b.dataset.copy){ const src=clone(find(b.dataset.copy)); Object.assign(src,{id:newQuote().id, number:null, saved:false, date:todayISO()}); ["version","ownerUid","ownerName","createdAt","updatedAt","updatedByUid","updatedByName","author","dept"].forEach(k=>delete src[k]); src.client={name:"",address:"",person:"",position:"",phone:"",email:""}; src.inv=blankInv(); Q=migrate(src); dirty=true; show("editor"); toast("Kópia pripravená — doplňte klienta."); }
+  if(b.dataset.copy){ const src=clone(find(b.dataset.copy)); Object.assign(src,{id:newQuote().id, number:null, saved:false, date:todayISO()}); ["version","ownerUid","ownerName","createdAt","updatedAt","updatedByUid","updatedByName","author","dept","depts"].forEach(k=>delete src[k]); src.client={name:"",address:"",person:"",position:"",phone:"",email:""}; src.inv=blankInv(); Q=migrate(src); dirty=true; show("editor"); toast("Kópia pripravená — doplňte klienta."); }
   if(b.dataset.del){ if(!confirm("Naozaj zmazať ponuku "+find(b.dataset.del).number+"?")) return; try{ await Store.deleteQuote(b.dataset.del); }catch(err){ toast("Túto ponuku môže zmazať len jej autor."); } renderList(); }
 });
 function migrate(q){ q.inv=Object.assign(blankInv(), q.inv||{}); q.stat=Object.assign({on:false,ids:[],text:""}, q.stat||{}); // doplní služby pridané neskôr do konfigurácie
