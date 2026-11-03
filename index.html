@@ -707,6 +707,26 @@ table.prices:not(.iTbl) thead th:first-child{width:46%}
 .page.c2 .gbList{padding:10px 16px 8px 18px!important} .page.c2 ul.sepList li{font-size:10.6px; padding-bottom:3px!important; margin-bottom:3px!important; line-height:1.35} .page.c2 ul.dotList li{font-size:10.6px; margin-bottom:4px; line-height:1.35} .page.c2 ul.dotList{margin-bottom:8px} .page.c2 .blueBox{margin-bottom:10px; padding:10px 16px 11px 22px; font-size:10.6px} .page.c2 .h2doc.big{margin-bottom:8px; font-size:14px} .page.c2 .introTxt{margin-bottom:8px}
 .bar .btn{padding:10px 12px; white-space:nowrap}
 .bar .btn.primary{flex:1 1 auto}
+/* vzdušnejšie rozloženie, keď je na strane voľné miesto */
+.page.air1 .block{margin-bottom:24px!important}
+.page.air1 .hdr{margin-bottom:56px!important}
+.page.air1 .specList .sr{padding:9px 0!important} .page.air1 .spec{gap:9px 26px!important}
+.page.air1 table.prices:not(.iTbl) td{padding:11px 10px!important} .page.air1 table.prices:not(.iTbl) th{padding:9px 10px!important}
+.page.air1 ul.sepList li{padding-bottom:10px!important; margin-bottom:10px!important} .page.air1 ul.dotList li{margin-bottom:10px} .page.air1 .gbList{padding:20px 22px 18px 24px!important}
+.page.air1 .h2doc.big{margin-bottom:18px} .page.air1 .introTxt{margin-bottom:20px} .page.air1 .lblRow,.page.air1 .secHead,.page.air1 .cenyHead{margin-bottom:12px}
+.page.air1 .totCard{margin-top:16px}
+.page.air2 .block{margin-bottom:32px!important}
+.page.air2 .hdr{margin-bottom:60px!important}
+.page.air2 .specList .sr{padding:11px 0!important} .page.air2 .spec{gap:12px 26px!important}
+.page.air2 table.prices:not(.iTbl) td{padding:13px 10px!important} .page.air2 table.prices:not(.iTbl) th{padding:10px 10px!important}
+.page.air2 ul.sepList li{padding-bottom:12px!important; margin-bottom:12px!important} .page.air2 ul.dotList li{margin-bottom:12px} .page.air2 .gbList{padding:24px 24px 20px 26px!important}
+.page.air2 .h2doc.big{margin-bottom:22px} .page.air2 .introTxt{margin-bottom:26px} .page.air2 .lblRow,.page.air2 .secHead,.page.air2 .cenyHead{margin-bottom:14px}
+.page.air2 .totCard{margin-top:20px}
+.page .pg-inner > .block{padding-bottom:var(--xg,0px)}
+.page .pg-inner > .hdr{padding-bottom:var(--xg,0px)}
+.page .specList .sr > div{padding:calc(var(--xr,0px) / 2) 0}
+.page .spec > div{padding:calc(var(--xr,0px) / 2) 0}
+.page ul.sepList li, .page ul.dotList li{padding-top:var(--xr,0px)}
 .vlHead{margin:0 0 12px!important; font-size:15px!important}
 .listWide{max-width:1120px!important}
 .qFilters{display:grid; grid-template-columns:1fr 260px; gap:10px; margin-bottom:12px}
@@ -1618,7 +1638,7 @@ function buildPages(){
   const inner=$("#mInner"), LIMIT=1123-72;
   const pages=[]; let cur=null;
   const mPage=meas.firstElementChild;
-  const setC=c=>{ mPage.classList.remove("c1","c2"); if(c) mPage.classList.add(c); };
+  const setC=c=>{ mPage.classList.remove("c1","c2","air1","air2"); if(c) mPage.classList.add(c); };
   const open=sub=>{ cur={sub,html:[],bottom:"",cls:""}; pages.push(cur); setC(""); inner.innerHTML=pageHeader(sub); };
   const fits=html=>{ inner.insertAdjacentHTML("beforeend",html); const ok=inner.offsetHeight<=LIMIT; if(!ok) inner.lastElementChild.remove(); return ok; };
   const isBottom=b=>b.includes("condBlock");
@@ -1646,12 +1666,27 @@ function buildPages(){
     open(sec.sub);
     sec.blocks.forEach(b=>place(b,sec.sub));
   });
+  // dodatočne: každej strane vyberie najvzdušnejšie rozloženie, ktoré sa ešte zmestí (voľné miesto → viac priestoru, tesno → zhustiť)
+  pages.forEach(pg=>{ if(pg.final) return;
+    let h=0; pg.cls="c2";
+    for(const c of ["air2","air1","","c1","c2"]){ setC(c); inner.innerHTML=pageHeader(pg.sub)+pg.html.join("")+(pg.bottom||""); h=inner.offsetHeight; if(h<=LIMIT){ pg.cls=c; break; } }
+    // zvyšné voľné miesto rozdelí medzi riadky (špecifikácia, body) a medzery medzi blokmi
+    pg.xg=0; pg.xr=0;
+    if(pg.cls.startsWith("air")) return;
+    const free=LIMIT-h-12, n=Math.max(1,pg.html.length), cnt=inner.querySelectorAll(".specList .sr, .spec > .l, ul.sepList li, ul.dotList li").length;
+    if(free<20) return;
+    let xr=cnt? Math.min(6, Math.floor(free*0.5/cnt)) : 0, xg=Math.min(26, Math.floor((free-xr*cnt)/(n+1)));
+    for(let t=0;t<6;t++){ mPage.style.setProperty("--xg",xg+"px"); mPage.style.setProperty("--xr",xr+"px"); inner.innerHTML=pageHeader(pg.sub)+pg.html.join("")+(pg.bottom||"");
+      if(inner.offsetHeight<=LIMIT) break; xr=Math.max(0,xr-1); xg=Math.max(0,Math.floor(xg*0.7)); }
+    mPage.style.removeProperty("--xg"); mPage.style.removeProperty("--xr");
+    pg.xg=xg; pg.xr=xr; });
+  setC("");
   meas.innerHTML="";
 
   const total=pages.length+2;
   const foot=n=>`<div class="pg-foot">${esc(P.company||"Cromwell a.s.")} · ${esc(qnum)}</div><div class="pg-num">${n} / ${total}</div>`;
   return `<div class="page cover" data-anchor="cover">${cover}</div><div class="page intro" data-anchor="client">${introPage}</div>` +
-    pages.map((pg,i)=>`<div class="page ${pg.cls||""}" ${pg.final?'data-anchor="closing"':""}><div class="pg-inner${pg.final?" finInner":""}">${pageHeader(pg.sub)}${pg.final?`<div class="finBody ${(Q.stat&&Q.stat.on&&(Q.stat.ids||[]).length)?"withSig":""}">${pg.html.join("")}</div>`:pg.html.join("")}</div>${pg.bottom?`<div class="pgBottom">${pg.bottom}</div>`:""}${foot(i+3)}</div>`).join("");
+    pages.map((pg,i)=>`<div class="page ${pg.cls||""}" ${pg.final?'data-anchor="closing"':""} ${(pg.xg||pg.xr)?`style="--xg:${pg.xg||0}px;--xr:${pg.xr||0}px"`:""}><div class="pg-inner${pg.final?" finInner":""}">${pageHeader(pg.sub)}${pg.final?`<div class="finBody ${(Q.stat&&Q.stat.on&&(Q.stat.ids||[]).length)?"withSig":""}">${pg.html.join("")}</div>`:pg.html.join("")}</div>${pg.bottom?`<div class="pgBottom">${pg.bottom}</div>`:""}${foot(i+3)}</div>`).join("");
 }
 
 /* fotka na 2. strane: výška = výška bloku OD/PRE (orez "cover" cez canvas, aby PDF sedelo) */
