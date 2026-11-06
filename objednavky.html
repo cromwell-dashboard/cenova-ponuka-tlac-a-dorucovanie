@@ -550,6 +550,15 @@ body{background:var(--panel)!important}
 .tBar{min-height:50px!important; padding-top:7px!important; padding-bottom:7px!important}
 .tBar .tSearch{padding:6px 12px!important}
 
+/* logo zarovnané s tlačidlom, text tlačidla na stred, Iba moje */
+.sLogo{margin-left:0!important; margin-right:0!important}
+.sLogo .mark{border-radius:4px!important}
+.sNew{justify-content:center!important}
+.fMine{margin:0 0 6px}
+.fMine .ck{width:14px; height:14px; border:1.5px solid #B9C0D4; border-radius:3px; flex:0 0 auto; display:grid; place-items:center; font-size:10px; background:var(--panel)}
+.fMine.on .ck{border-color:#fff; background:#fff; color:var(--blue)}
+.fMine.on .ck::after{content:"✓"; font-weight:700}
+
 /* tlač / vektorové PDF */
 @page{size:A4; margin:0}
 @media print{
@@ -570,10 +579,11 @@ body{background:var(--panel)!important}
     <div class="sLogo"><div class="mark">Cromwell</div><span class="lt">Objednávky</span></div>
     <button class="sNew" id="bNewL" type="button" title="Nová objednávka"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg><span class="lt">Nová objednávka</span></button>
     <div class="sFilters" id="sFilters">
-      <div class="fh">Obchodník a mesiac <button class="fClr" id="fClear" type="button" hidden></button></div>
+      <div class="fh">Filtre <button class="fClr" id="fClear" type="button" hidden></button></div>
+      <button class="fi fMine" id="fMine" type="button"><span class="ck"></span>Iba moje objednávky<span class="n" id="fMineN">0</span></button>
       <select class="inp sSel" id="fOwner" aria-label="Obchodník"></select>
       <select class="inp sSel" id="fMonth" aria-label="Mesiac distribúcie"></select>
-      <div class="fh">Klient</div>
+      <div class="fh">Klient <button class="fClr" id="bClients" type="button" title="Spravovať stálych klientov">Spravovať</button></div>
       <div class="flt" id="fClient"></div>
       <div class="fh">Stav</div>
       <div class="flt" id="fStatus"></div>
@@ -590,7 +600,7 @@ body{background:var(--panel)!important}
   <div class="content">
   <header class="tBar">
     <button class="burger" id="bMenu" type="button" aria-label="Menu">☰</button>
-    <nav class="tNav"><button data-view="list" class="on" type="button">Evidencia <span class="cnt" id="swCnt">0</span></button><i></i><button data-view="editor" type="button">Objednávka</button><i></i><button id="bClients" type="button">Stáli klienti <span class="cnt" id="clCnt">0</span></button><i></i><button data-view="profile" type="button">Môj profil</button></nav>
+    <nav class="tNav"><button data-view="list" class="on" type="button">Evidencia <span class="cnt" id="swCnt">0</span></button><i></i><button data-view="editor" type="button">Objednávka</button><i></i><button data-view="profile" type="button">Môj profil</button></nav>
     <div class="fChips" id="fChips" hidden></div>
     <input class="inp tSearch" id="fSearch" placeholder="Hľadať klienta, názov alebo číslo…" aria-label="Hľadať">
   </header>
@@ -1354,7 +1364,7 @@ const S = x => x.summary || summaryOf(migrate(clone(x)));
 const monthOf = x => { const s=S(x); return (s.distFrom||s.delivery||x.date||"").slice(0,7); };
 const monthLbl = ym => { const [y,m]=ym.split("-"); return MONTHS[+m-1]+" "+y; };
 function drawList(){
-  lsSet("filters",{owner:F.owner, month:F.month, status:F.status, svc:F.svc, client:F.client, sort:F.sort});
+  lsSet("filters",{mine:F.mine, owner:F.owner, month:F.month, status:F.status, svc:F.svc, client:F.client, sort:F.sort});
   if(F.client && F.client!=="_other" && !clientById(F.client)) F.client="";
   const q=plain(F.q);
   // výber obchodníka a mesiaca
@@ -1367,6 +1377,7 @@ function drawList(){
   const base=allOrders.filter(x=>{ const s=S(x);
     if(q && ![x.number, x.client?.name, x.title, s.title, x.code].some(v=>plain(v).includes(q))) return false;
     if(F.owner && (x.ownerName||"—")!==F.owner) return false;
+    if(F.mine && x.ownerUid!==Store.uid) return false;
     if(F.month && monthOf(x)!==F.month) return false; return true; });
   const fSt=x=>!F.status || stKey(x.status)===F.status, fSv=x=>!F.svc || S(x).keys?.includes(F.svc);
   const isOther=x=>!clientById(x.clientKey), fCl=x=>!F.client || (F.client==="_other"? isOther(x) : x.clientKey===F.client);
@@ -1378,14 +1389,15 @@ function drawList(){
   $("#fStatus").innerHTML=`<button class="fi ${F.status?"":"on"}" data-fst="">Všetky<span class="n">${bySv.length}</span></button>`+STATUSES.map(s=>{ const n=bySv.filter(x=>stKey(x.status)===s.k).length; return `<button class="fi ${F.status===s.k?"on":""} ${n?"":"zero"}" data-fst="${s.k}"><i style="background:${s.c}"></i>${s.l}<span class="n">${n}</span></button>`; }).join("");
   $("#fSvc").innerHTML=SVCS.map(s=>{ const n=bySt.filter(x=>S(x).keys?.includes(s.key)).length; return `<button class="fi ${F.svc===s.key?"on":""} ${n?"":"zero"}" data-fsv="${s.key}">${s.name}<span class="n">${n}</span></button>`; }).join("");
   let list=base.filter(x=>fSt(x)&&fSv(x)&&fCl(x));
-  const nAct=[F.q,F.owner,F.month,F.status,F.svc,F.client].filter(Boolean).length;
+  const nAct=[F.q,F.owner,F.month,F.status,F.svc,F.client,F.mine].filter(Boolean).length;
+  $("#fMine").classList.toggle("on",!!F.mine); $("#fMineN").textContent=allOrders.filter(x=>x.ownerUid===Store.uid).length;
   $("#fClear").hidden=!nAct; $("#fClear").textContent=`Zrušiť filtre (${nAct})`;
   const chips=[]; const kc=clientById(F.client);
   if(F.client) chips.push(["client", F.client==="_other"?"Ostatní klienti":kc?.name]);
   if(F.status) chips.push(["status", stOf(F.status).l]); if(F.svc) chips.push(["svc", svcDef(F.svc)?.name]);
   if(F.owner) chips.push(["owner", F.owner]); if(F.month) chips.push(["month", monthLbl(F.month)]);
   $("#fChips").innerHTML=chips.map(([k,l])=>`<button type="button" data-chip="${k}" title="Zrušiť filter">${esc(l||"")} <b>×</b></button>`).join("");
-  $("#clCnt").textContent=clients.filter(c=>!c.archived).length;
+
   // tabuľka
   const val={num:x=>x.number||"", cl:x=>plain(x.client?.name), date:x=>x.date||"", del:x=>S(x).delivery||"", dist:x=>S(x).distFrom||S(x).distTo||"", cnt:x=>+S(x).count||0, sum:x=>+S(x).total||0, st:x=>STATUSES.findIndex(s=>s.k===stKey(x.status)), own:x=>plain(x.ownerName)};
   const f=val[F.sort.k]||val.date; list=[...list].sort((a,b)=>{ const A=f(a),B=f(b); return (A<B?-1:A>B?1:0)*F.sort.d || (b.updatedAt||"").localeCompare(a.updatedAt||""); });
@@ -1413,7 +1425,8 @@ $("#fMonth").addEventListener("change",e=>{ F.month=e.target.value; drawList(); 
 $("#fChips").addEventListener("click",e=>{ const b=e.target.closest("[data-chip]"); if(!b) return; F[b.dataset.chip]=""; drawList(); });
 $("#fClient").addEventListener("click",e=>{ const b=e.target.closest("[data-fcl]"); if(!b) return; F.client=b.dataset.fcl; drawList(); });
 $("#bClients").addEventListener("click",()=>{ $("#app").classList.remove("open"); openClients(); });
-$("#fClear").addEventListener("click",()=>{ Object.assign(F,{q:"",owner:"",month:"",status:"",svc:"",client:""}); $("#fSearch").value=""; drawList(); });
+$("#fClear").addEventListener("click",()=>{ Object.assign(F,{q:"",owner:"",month:"",status:"",svc:"",client:"",mine:false}); $("#fSearch").value=""; drawList(); });
+$("#fMine").addEventListener("click",()=>{ F.mine=!F.mine; drawList(); });
 $("#fStatus").addEventListener("click",e=>{ const b=e.target.closest("[data-fst]"); if(!b) return; F.status=b.dataset.fst; drawList(); });
 $("#fSvc").addEventListener("click",e=>{ const b=e.target.closest("[data-fsv]"); if(!b) return; F.svc=F.svc===b.dataset.fsv?"":b.dataset.fsv; drawList(); });
 $("#oList").addEventListener("click", async e=>{
