@@ -164,8 +164,9 @@ button{cursor:pointer}
 .hint code{background:var(--grey-soft); border-radius:4px; padding:0 4px; font-family:inherit}
 .chk{display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); cursor:pointer; white-space:nowrap}
 .chk input{width:15px; height:15px; accent-color:var(--blue); margin:0}
-.tiles{display:grid; grid-template-columns:repeat(3,1fr); gap:8px}
-.tile{border:1.5px solid var(--line); background:var(--panel); border-radius:10px; padding:10px 12px; text-align:left; font-size:13px; font-weight:500; display:flex; gap:10px; align-items:center}
+.tiles{display:grid; grid-template-columns:repeat(auto-fit,minmax(132px,1fr)); gap:8px}
+.tile{border:1.5px solid var(--line); background:var(--panel); border-radius:10px; padding:9px 10px; text-align:left; font-size:12.5px; line-height:1.3; font-weight:500; display:flex; gap:8px; align-items:center; min-width:0; overflow:hidden}
+.tile > span:last-child{min-width:0}
 .tile .box{width:18px; height:18px; border-radius:5px; border:1.5px solid var(--line); flex:0 0 auto; display:grid; place-items:center; font-size:12px; color:#fff}
 .tile.on{border-color:var(--blue); background:var(--blue-soft); color:var(--blue)}
 .tile.on .box{background:var(--blue); border-color:var(--blue)}
@@ -183,13 +184,16 @@ button{cursor:pointer}
 .spHead .tot{font-size:11.5px; color:var(--muted)}
 .spSum{border-top:1px solid var(--line); padding-top:8px; margin-top:8px; font-size:13px}
 .spSum .tot{color:var(--blue); font-weight:600}
-.exRow{display:grid; grid-template-columns:38% 1fr auto 28px; gap:6px; margin-bottom:6px; align-items:center}
-.prHead,.prRow{display:grid; grid-template-columns:1fr 92px 92px 96px 28px; gap:6px; align-items:center}
+.exRow{display:grid; grid-template-columns:38% 1fr auto 16px 16px 28px; gap:6px; margin-bottom:6px; align-items:center}
+.prHead,.prRow{display:grid; grid-template-columns:1fr 92px 92px 96px 16px 16px 28px; gap:6px; align-items:center}
 .prHead{font-size:11px; color:var(--muted); margin-bottom:4px}
 .prRow{margin-bottom:6px}
 .prRow .tot{font-size:12.5px; text-align:right; font-variant-numeric:tabular-nums; font-weight:500; padding-right:2px}
 .cell{padding:7px 8px; font-size:12.5px}
 .cell.r{text-align:right}
+.mv{border:0; background:transparent; color:var(--muted); font-size:12px; border-radius:6px; height:30px; width:16px; padding:0}
+.mv:hover:not(:disabled){background:var(--bg); color:var(--blue)}
+.mv:disabled{opacity:.25; cursor:default}
 .x{border:0; background:transparent; color:var(--muted); font-size:17px; border-radius:6px; height:30px; width:28px}
 .x:hover{background:var(--bg); color:var(--red)}
 .add{border:1.5px dashed var(--line); background:transparent; border-radius:8px; padding:7px 10px; font-size:12px; color:var(--blue); width:100%; font-weight:500}
@@ -422,13 +426,12 @@ button{cursor:pointer}
   .bPrintBtn{display:none}
 }
 @media (max-width: 520px){
-  .spRow{grid-template-columns:1fr 66px 66px 56px 26px; gap:4px}
   .grid2,.grid3,.tiles{grid-template-columns:1fr}
   .prHead{display:none}
-  .prRow{grid-template-columns:1fr 1fr 28px; padding-bottom:8px; border-bottom:1px dashed var(--line)}
+  .prRow{grid-template-columns:1fr 1fr 16px 16px 28px; padding-bottom:8px; border-bottom:1px dashed var(--line)}
   .prRow .nm{grid-column:1 / -1}
   .prRow .tot{grid-column:1 / 3; text-align:left}
-  .exRow{grid-template-columns:1fr 28px}
+  .exRow{grid-template-columns:1fr 16px 16px 28px}
   .exRow .cell:nth-child(2){grid-column:1 / 2}
   .bar{flex-wrap:wrap}
   .bar .btn{flex:1}
@@ -738,7 +741,7 @@ const newId = () => "o"+Date.now().toString(36)+Math.random().toString(36).slice
 
 function blankAd(){ return spNormAd({
   item:"", type:AD_TYPES[0], count:"", countNote:"", weight:"", format:"", extra:[],
-  delivery:"", deliveryHl:true, distFrom:"", distTo:"", sp:true, spDate:"", resend:"nie",
+  delivery:"", deliveryHl:true, distFrom:"", distTo:"", sp:true, spDate:"", resend:"nie", resendDate:"",
   rows:[{name:"", price:"", qty:""}], vatNote:"Uvedené ceny sú bez 23 % DPH.",
   prepSp:DEF_PREP_SP, prepCrw:DEF_PREP_CRW, place:DEF_PLACE, placeLine:true,
   split:{on:false, title:"Rozdelenie zásielok", sum:true, h:["Hmotnosť","Sieť CRW","Sieť SP"], rows:[{w:"",v:["",""]}]}
@@ -847,29 +850,55 @@ function renderForm(){
        <div class="grid2">${fld("Celkový počet zásielok",A+".count",{im:"numeric",ph:"napr. 67 800"})}${fld("Poznámka k počtu",A+".countNote",{ph:"napr. dodaj dtb cez IPOOX"})}</div>
        <div class="grid2">${fld("Hmotnosť zásielky",A+".weight",{list:"dlWeights",ph:"napr. do 15 g"})}${fld("Formát zásielky",A+".format",{list:"dlFormats",ph:"napr. C6/C5"})}</div>
        <div class="sub">Ďalšie parametre</div>
-       ${d.extra.map((r,j)=>`<div class="exRow"><input class="cell" data-p="${A}.extra.${j}.k" value="${esc(r.k)}" placeholder="Parameter"><input class="cell" data-p="${A}.extra.${j}.v" value="${esc(r.v)}" placeholder="Hodnota"><label class="chk" title="Zvýrazniť modrou"><input type="checkbox" data-p="${A}.extra.${j}.hl" ${r.hl?"checked":""}>zvýrazniť</label><button class="x" type="button" data-act="exDel" data-j="${j}" title="Odstrániť">×</button></div>`).join("")}
+       ${d.extra.map((r,j)=>`<div class="exRow"><input class="cell" data-p="${A}.extra.${j}.k" value="${esc(r.k)}" placeholder="Parameter"><input class="cell" data-p="${A}.extra.${j}.v" value="${esc(r.v)}" placeholder="Hodnota"><label class="chk" title="Zvýrazniť modrou"><input type="checkbox" data-p="${A}.extra.${j}.hl" ${r.hl?"checked":""}>zvýrazniť</label><button class="mv" type="button" data-mv="extra" data-j="${j}" data-d="-1" title="Posunúť vyššie" aria-label="Posunúť vyššie" ${j===0?"disabled":""}>↑</button><button class="mv" type="button" data-mv="extra" data-j="${j}" data-d="1" title="Posunúť nižšie" aria-label="Posunúť nižšie" ${j===d.extra.length-1?"disabled":""}>↓</button><button class="x" type="button" data-act="exDel" data-j="${j}" title="Odstrániť">×</button></div>`).join("")}
        <button class="add" type="button" data-act="exAdd">+ Pridať parameter</button>`);
 
-    h += card("term",5,"Termíny","dodanie a distribúcia",
-      `<div class="grid2">${fld("Termín dodania zásielok",A+".delivery",{type:"date",extra:`<label class="chk" style="margin-left:auto"><input type="checkbox" data-p="${A}.deliveryHl" ${d.deliveryHl?"checked":""}>zvýrazniť</label>`})}${fld("Miesto dodania",A+".place",{ph:DEF_PLACE})}</div>
+    h += card("term",5,"Termíny a príprava zásielok","dodanie, distribúcia, pokyny",
+      `<div class="grid2" style="align-items:end">${fld("Termín dodania zásielok",A+".delivery",{type:"date",extra:`<label class="chk" style="margin-left:auto"><input type="checkbox" data-p="${A}.deliveryHl" ${d.deliveryHl?"checked":""}>zvýrazniť</label>`})}${fld("Miesto dodania",A+".place",{ph:DEF_PLACE})}</div>
        <div class="grid2">${fld("Distribúcia v sieti Cromwell od",A+".distFrom",{type:"date"})}${fld("Distribúcia do",A+".distTo",{type:"date"})}</div>
+       <div class="grid2" style="align-items:end">
+         <div class="fld"><label>Doposielka nedoručených zásielok</label>${yn(A+".resend",[["áno","áno"],["nie","nie"]])}</div>
+         ${d.resend==="áno"?fld("Termín doposielky",A+".resendDate",{type:"date"}):"<div></div>"}
+       </div>
+       <div class="sub">Slovenská pošta</div>
        <div class="grid2" style="align-items:end">
          <div class="fld"><label>Časť zásielok ide cez Slovenskú poštu</label>${yn(A+".sp",[[true,"áno"],[false,"nie"]])}</div>
          ${d.sp?fld("Podaj zásielok na Slovenskú poštu",A+".spDate",{type:"date"}):"<div></div>"}
        </div>
-       <div class="fld"><label>Doposielka nedoručených zásielok</label>${yn(A+".resend",[["áno","áno"],["nie","nie"]])}</div>`);
+       ${d.sp?fld("Príprava zásielok pre Slovenskú poštu",A+".prepSp",{area:true,rows:4})+`<p class="hint" style="margin:-4px 0 10px">Každý riadok = jeden bod. <code>**tučné**</code> · <code>==zvýraznené modrou==</code></p>`:""}
+       <div class="sub">Cromwell</div>
+       ${fld("Príprava zásielok pre Cromwell",A+".prepCrw",{area:true,rows:3})}
+       <label class="chk" style="margin:-2px 0 8px"><input type="checkbox" data-p="${A}.placeLine" ${d.placeLine?"checked":""}> pridať riadok „Dodaj <i>termín</i> na <i>miesto dodania</i>“</label>
+       <p class="hint" style="margin:-4px 0 10px">Každý riadok = jeden bod. <code>**tučné**</code> · <code>==zvýraznené modrou==</code></p>`);
 
-    const S=d.split, st=splitTot(d), n=spCols(S), gcols=`grid-template-columns:1fr repeat(${n},minmax(56px,84px))${S.sum?" 72px":""} 28px`;
-    h += card("split",6,"Druhá tabuľka","voliteľná",
+    const tot=adTotal(d);
+    h += card("ceny",6,"Ceny","bez DPH",
+      `${fld("Úvodný text objednávky","intro",{area:true,rows:3,extra:` <button class="linkBtn" type="button" data-act="autoIntro" style="margin-left:auto">${O.introAuto?"automatický":"obnoviť automatický"}</button>`,hint:"V PDF je nad špecifikáciou – „Záväzne objednávame doručenie zásielok…“"})}
+       <div class="sub">Cenová tabuľka</div>
+       <div class="prHead"><span>Špecifikácia</span><span style="text-align:right">Cena za 1 ks</span><span style="text-align:right">Počet ks</span><span style="text-align:right">Cena celkom</span><span></span><span></span><span></span></div>
+       ${d.rows.map((r,j)=>`<div class="prRow"><input class="cell nm" data-p="${A}.rows.${j}.name" value="${esc(r.name)}" placeholder="${esc(rowPh(d))}">
+         <input class="cell r" data-p="${A}.rows.${j}.price" value="${esc(r.price)}" placeholder="0,0000" inputmode="decimal">
+         <input class="cell r" data-p="${A}.rows.${j}.qty" value="${esc(r.qty)}" placeholder="${isNaN(effCount(d))?"ks":esc(fmtInt(effCount(d)))}" inputmode="numeric">
+         <span class="tot" data-tot="${j}">${isNaN(rowTotal(d,r))?"–":fmtSum(rowTotal(d,r))}</span>
+         <button class="mv" type="button" data-mv="rows" data-j="${j}" data-d="-1" title="Posunúť vyššie" aria-label="Posunúť vyššie" ${j===0?"disabled":""}>↑</button><button class="mv" type="button" data-mv="rows" data-j="${j}" data-d="1" title="Posunúť nižšie" aria-label="Posunúť nižšie" ${j===d.rows.length-1?"disabled":""}>↓</button>
+         <button class="x" type="button" data-act="rowDel" data-j="${j}" title="Odstrániť riadok" ${d.rows.length<2?"disabled":""}>×</button></div>`).join("")}
+       <button class="add" type="button" data-act="rowAdd">+ Pridať riadok</button>
+       <div class="sumLine"><span>Spolu bez DPH</span><b id="sumAd">${fmtSum(tot)}</b></div>
+       <p class="hint" style="margin:8px 0 10px">Ak počet ks nevyplníte, použije sa celkový počet zásielok (napr. pri spracovaní databázy dajte 1). Cenu za kus píšte s presnosťou na 4 desatinné miesta.</p>
+       ${fld("Poznámka pod tabuľkou",A+".vatNote")}`);
+
+    const S=d.split, st=splitTot(d), n=spCols(S), gcols=`grid-template-columns:1fr repeat(${n},minmax(50px,84px))${S.sum?" 68px":""} 16px 16px 28px`;
+    h += card("split",7,"Druhá tabuľka","voliteľná",
       `<label class="chk" style="margin:2px 0 6px; color:var(--ink); font-size:13px"><input type="checkbox" data-p="${A}.split.on" data-rr ${S.on?"checked":""}> Pridať druhú tabuľku do objednávky</label>
        <p class="hint" style="margin:0 0 12px">S druhou tabuľkou sa objednávka rozloží do dvoch stĺpcov. Predvyplnené je rozdelenie zásielok podľa siete, ale nadpis, stĺpce aj riadky môžete prepísať na čokoľvek.</p>
        ${S.on?`${fld("Nadpis tabuľky",A+".split.title")}
-       <div class="spRow spHead" style="${gcols}">${S.h.map((x,k)=>`<input class="cell ${k?"r":""}" data-p="${A}.split.h.${k}" value="${esc(x)}" title="Názov stĺpca – dá sa prepísať">`).join("")}${S.sum?`<span class="tot">Spolu</span>`:""}<span></span></div>
+       <div class="spRow spHead" style="${gcols}">${S.h.map((x,k)=>`<input class="cell ${k?"r":""}" data-p="${A}.split.h.${k}" value="${esc(x)}" title="Názov stĺpca – dá sa prepísať">`).join("")}${S.sum?`<span class="tot">Spolu</span>`:""}<span></span><span></span><span></span></div>
        ${S.rows.map((r,j)=>`<div class="spRow" style="${gcols}"><input class="cell" data-p="${A}.split.rows.${j}.w" value="${esc(r.w)}" placeholder="napr. do 80 g">
          ${r.v.map((x,k)=>`<input class="cell r" data-p="${A}.split.rows.${j}.v.${k}" value="${esc(x)}" placeholder="–">`).join("")}
          ${S.sum?`<span class="tot" data-sprow="${j}">${isNaN(spRowSum(r))?"–":fmtInt(spRowSum(r))}</span>`:""}
+         <button class="mv" type="button" data-mv="split" data-j="${j}" data-d="-1" title="Posunúť vyššie" aria-label="Posunúť vyššie" ${j===0?"disabled":""}>↑</button><button class="mv" type="button" data-mv="split" data-j="${j}" data-d="1" title="Posunúť nižšie" aria-label="Posunúť nižšie" ${j===S.rows.length-1?"disabled":""}>↓</button>
          <button class="x" type="button" data-act="spDel" data-j="${j}" title="Odstrániť riadok" ${S.rows.length<2?"disabled":""}>×</button></div>`).join("")}
-       ${S.sum?`<div class="spRow spSum" style="${gcols}"><span>Spolu</span>${st.col.map((v,k)=>`<span class="tot" id="spC${k}">${isNaN(v)?"–":fmtInt(v)}</span>`).join("")}<span class="tot" id="spT">${isNaN(st.t)?"–":fmtInt(st.t)}</span><span></span></div>`:""}
+       ${S.sum?`<div class="spRow spSum" style="${gcols}"><span>Spolu</span>${st.col.map((v,k)=>`<span class="tot" id="spC${k}">${isNaN(v)?"–":fmtInt(v)}</span>`).join("")}<span class="tot" id="spT">${isNaN(st.t)?"–":fmtInt(st.t)}</span><span></span><span></span><span></span></div>`:""}
        <div style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap">
          <button class="add" type="button" data-act="spAdd" style="flex:1">+ Riadok</button>
          <button class="add" type="button" data-act="spColAdd" style="flex:1" ${n>=4?"disabled":""}>+ Stĺpec</button>
@@ -877,26 +906,8 @@ function renderForm(){
        <label class="chk" style="margin:10px 0 0"><input type="checkbox" data-p="${A}.split.sum" data-rr ${S.sum?"checked":""}> Sčítať čísla (stĺpec a riadok Spolu)</label>
        ${S.sum?`<p class="hint" id="spHint" style="margin:6px 0 0">${spHint(d)}</p>`:""}`:""}`);
 
-    const tot=adTotal(d);
-    h += card("ceny",7,"Ceny","bez DPH",
-      `<div class="prHead"><span>Špecifikácia</span><span style="text-align:right">Cena za 1 ks</span><span style="text-align:right">Počet ks</span><span style="text-align:right">Cena celkom</span><span></span></div>
-       ${d.rows.map((r,j)=>`<div class="prRow"><input class="cell nm" data-p="${A}.rows.${j}.name" value="${esc(r.name)}" placeholder="${esc(rowPh(d))}">
-         <input class="cell r" data-p="${A}.rows.${j}.price" value="${esc(r.price)}" placeholder="0,0000" inputmode="decimal">
-         <input class="cell r" data-p="${A}.rows.${j}.qty" value="${esc(r.qty)}" placeholder="${isNaN(effCount(d))?"ks":esc(fmtInt(effCount(d)))}" inputmode="numeric">
-         <span class="tot" data-tot="${j}">${isNaN(rowTotal(d,r))?"–":fmtSum(rowTotal(d,r))}</span>
-         <button class="x" type="button" data-act="rowDel" data-j="${j}" title="Odstrániť riadok" ${d.rows.length<2?"disabled":""}>×</button></div>`).join("")}
-       <button class="add" type="button" data-act="rowAdd">+ Pridať riadok</button>
-       <div class="sumLine"><span>Spolu bez DPH</span><b id="sumAd">${fmtSum(tot)}</b></div>
-       <p class="hint" style="margin:8px 0 10px">Ak počet ks nevyplníte, použije sa celkový počet zásielok (napr. pri spracovaní databázy dajte 1). Cenu za kus píšte s presnosťou na 4 desatinné miesta.</p>
-       ${fld("Poznámka pod tabuľkou",A+".vatNote")}`);
-
-    h += card("text",8,"Texty v objednávke","úvod a pokyny",
-      `${fld("Úvodný text","intro",{area:true,rows:3,extra:` <button class="linkBtn" type="button" data-act="autoIntro" style="margin-left:auto">${O.introAuto?"automatický":"obnoviť automatický"}</button>`})}
-       ${d.sp?fld("Príprava zásielok pre Slovenskú poštu",A+".prepSp",{area:true,rows:4}):""}
-       ${fld("Príprava zásielok pre Cromwell",A+".prepCrw",{area:true,rows:3})}
-       <label class="chk" style="margin:-2px 0 10px"><input type="checkbox" data-p="${A}.placeLine" ${d.placeLine?"checked":""}> pridať riadok „Dodaj <i>termín</i> na <i>miesto dodania</i>“</label>
-       <p class="hint">Každý riadok = jeden bod. <code>**tučné**</code> · <code>==zvýraznené modrou==</code></p>
-       ${fld("Poznámka v objednávke (nepovinné)","noteDoc",{area:true,rows:2})}`);
+    h += card("text",8,"Poznámka v objednávke","nepovinné",
+      `${fld("Poznámka (zobrazí sa v PDF pod pokynmi)","noteDoc",{area:true,rows:2})}`);
   }
   h += card("int",9,"Interná poznámka","nezobrazí sa v PDF", fld("Poznámka pre kolegov","note",{area:true,rows:2}));
 
@@ -952,6 +963,8 @@ form.addEventListener("click", e=>{
   if(b.dataset.status){ O.status=b.dataset.status; dirty=true; renderForm(); return; }
   if(b.dataset.set){ let v=b.dataset.val; if(v==="true") v=true; if(v==="false") v=false; setP(b.dataset.set, v); dirty=true; renderForm(); schedulePreview(); return; }
   if(b.dataset.svc){ const s=svc(b.dataset.svc); s.on=!s.on; if(!activeSvcs().length){ s.on=true; toast("Objednávka musí obsahovať aspoň jednu službu."); } dirty=true; renderForm(); schedulePreview(); return; }
+  if(b.dataset.mv){ const arr= b.dataset.mv==="rows"? d.rows : b.dataset.mv==="extra"? d.extra : d.split.rows;
+    const j=+b.dataset.j, k=j+(+b.dataset.d); if(k>=0 && k<arr.length){ [arr[j],arr[k]]=[arr[k],arr[j]]; dirty=true; renderForm(); schedulePreview(); } return; }
   const a=b.dataset.act; if(!a) return;
   if(a==="rowAdd"){ d.rows.push({name:"",price:"",qty:""}); }
   else if(a==="rowDel"){ d.rows.splice(+b.dataset.j,1); }
@@ -1003,7 +1016,7 @@ function docBlocks(){
     if(d.sp && d.spDate) steps.push(st("Podaj na Slovenskú poštu",fmtD(d.spDate)));
     if(d.distFrom||d.distTo) steps.push(st("Distribúcia v sieti Cromwell",fmtRange(d.distFrom,d.distTo)));
     if(!steps.length) steps.push(st("Termíny","doplňte termín dodania a distribúcie"));
-    steps.push(st("Doposielka nedoručených",d.resend||"nie","","g"));
+    steps.push(st("Doposielka nedoručených", d.resend==="áno"? (d.resendDate? fmtD(d.resendDate) : "áno") : "nie", "", d.resend==="áno"&&d.resendDate? "" : "g"));
     const secTerms=`<div class="sec">${H("Termíny",1)}<div class="dTl">${steps.join("")}</div>
       ${d.place && !d.placeLine?`<div class="dTimeNote"><span>Miesto dodania: <b>${esc(d.place)}</b></span></div>`:""}</div>`;
     let secSplit="";
