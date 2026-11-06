@@ -34,7 +34,84 @@ button{cursor:pointer}
 [hidden]{display:none!important}
 
 /* ── shell ── */
-.app{display:flex; flex-direction:column; height:100%}
+.app{display:flex; height:100%}
+.content{flex:1; min-width:0; display:flex; flex-direction:column; height:100%}
+:root{--side:#F3F4F7; --sideLine:#E3E6EE}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --side:#141826; --sideLine:#262B40 } }
+:root[data-theme="dark"]{--side:#141826; --sideLine:#262B40}
+body{background:var(--panel)!important}
+.side{width:250px; flex:0 0 auto; background:var(--side); border-right:1px solid var(--sideLine); display:flex; flex-direction:column; padding:16px 14px 12px; overflow-y:auto; overflow-x:hidden; padding-top:calc(16px + env(safe-area-inset-top,0px))}
+.sLogo{display:flex; align-items:center; gap:10px; font-weight:600; font-size:15px; margin:2px 4px 14px; white-space:nowrap}
+.sLogo .mark,.mTop .mark{background:var(--blue); color:#fff; font-weight:500; font-size:13px; padding:6px 10px; border-radius:8px 8px 8px 0}
+.sNew{background:var(--blue); color:#fff; border:0; border-radius:10px; padding:10px 12px; font-weight:600; font-size:13.5px; width:100%; display:flex; align-items:center; gap:8px; margin-bottom:12px; white-space:nowrap}
+.sNew:hover{background:var(--navy)}
+.sNew svg,.nav svg,.sOut svg{width:17px; height:17px; flex:0 0 auto}
+.side .nav{display:flex; flex-direction:column; gap:2px; margin:0; background:transparent; padding:0; border-radius:0}
+.side .nav button{display:flex; align-items:center; gap:10px; padding:7px 10px; border-radius:8px; border:0; background:transparent; color:var(--muted); font-weight:500; font-size:13px; text-align:left; white-space:nowrap; box-shadow:none}
+.side .nav button:hover{color:var(--ink)}
+.side .nav button.on{background:var(--panel); color:var(--blue); box-shadow:0 1px 3px rgba(20,30,80,.08)}
+.side .nav .cnt{margin-left:auto; font-size:11px; background:rgba(99,107,133,.12); color:var(--muted); border-radius:10px; padding:0 7px}
+.sFilters{margin-top:4px}
+.fh{display:flex; align-items:center; justify-content:space-between; font-size:10.5px; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); font-weight:600; margin:8px 6px 4px}
+.fClr{border:0; background:none; color:var(--blue); font-size:11.5px; font-weight:500; text-transform:none; letter-spacing:0; padding:0}
+.flt{display:flex; flex-direction:column; gap:1px; margin-bottom:6px}
+.fi{display:flex; align-items:center; gap:8px; padding:5px 10px; border-radius:8px; border:0; background:transparent; color:var(--ink); font-size:12.8px; text-align:left; width:100%}
+.fi:hover{background:rgba(53,82,204,.07)}
+.fi .n{margin-left:auto; font-size:11.5px; color:var(--muted)}
+.fi.on{background:var(--blue); color:#fff; font-weight:500}
+.fi.on .n{color:rgba(255,255,255,.8)}
+.fi.zero:not(.on){opacity:.45}
+.fi i{width:8px; height:8px; border-radius:50%; flex:0 0 auto}
+.fi .code{font-size:10px; font-weight:600; color:var(--blue); background:rgba(53,82,204,.1); border-radius:5px; padding:1px 6px}
+.fi.on .code{background:rgba(255,255,255,.2); color:#fff}
+.fi.on i{outline:1.5px solid #fff}
+.sSel{margin:0 0 6px; padding:7px 10px; font-size:12.5px}
+.sUser{margin-top:auto; border-top:1px solid var(--sideLine); padding-top:12px; display:flex; align-items:center; gap:10px; min-width:0}
+.sFilters + .sUser{margin-top:14px}
+.av{width:32px; height:32px; border-radius:50%; background:var(--blue-soft); color:var(--blue); display:grid; place-items:center; font-weight:600; font-size:12px; flex:0 0 auto}
+.wTxt{min-width:0; flex:1}
+.wTxt b{display:block; font-size:12.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.wTxt small{display:block; color:var(--muted); font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.sOut{border:0; background:none; color:var(--muted); display:flex; align-items:center; gap:6px; padding:6px; border-radius:8px; font-size:12px}
+.sOut:hover{color:var(--ink); background:rgba(99,107,133,.1)}
+.sOut .lt{display:none}
+/* zúžené menu v editore */
+.app.rail{--railW:64px}
+.app.rail .side{width:64px; padding-left:10px; padding-right:10px}
+.app.rail .side .lt,.app.rail .side .cnt,.app.rail .sFilters,.app.rail .wTxt{display:none}
+.app.rail .sLogo{justify-content:center; margin-left:0; margin-right:0}
+.app.rail .sLogo .mark{font-size:0; padding:0; width:34px; height:34px; position:relative}
+
+.app.rail .sNew,.app.rail .side .nav button{justify-content:center; padding-left:0; padding-right:0}
+.app.rail .sUser{flex-direction:column; gap:6px}
+/* horná biela lišta */
+.tBar{position:sticky; top:0; z-index:20; display:flex; align-items:center; gap:14px; padding:10px 22px; background:var(--panel); border-bottom:1px solid var(--line); min-height:56px}
+.sw{display:inline-flex; background:var(--bg); padding:3px; gap:3px; border-radius:6px}
+.sw button{border:0; background:transparent; padding:7px 18px; font-size:13px; font-weight:500; color:var(--muted); display:flex; align-items:center; gap:6px; border-radius:4px}
+.sw button.on{background:var(--panel); color:var(--blue); box-shadow:0 1px 3px rgba(20,30,80,.12)}
+.sw .cnt{font-size:11px; background:var(--grey-soft); color:var(--muted); border-radius:4px; padding:0 6px}
+.tNav{display:flex; align-items:center; gap:4px}
+.tNav button{border:0; background:none; padding:6px 10px; font-size:13.5px; font-weight:500; color:var(--muted); display:flex; align-items:center; gap:6px; white-space:nowrap}
+.tNav button:hover{color:var(--ink)}
+.tNav button.on{color:var(--blue); font-weight:600}
+.tNav i{width:1px; height:16px; background:var(--line); flex:0 0 auto}
+.tNav .cnt{font-size:11px; background:var(--grey-soft); color:var(--muted); border-radius:4px; padding:0 6px; font-weight:500}
+.tNav button.on .cnt{background:var(--blue-soft); color:var(--blue)}
+.tBar .tSearch{margin-left:auto; width:320px; padding:8px 12px; font-size:13px}
+.burger{display:none}
+.sSearch{margin:0 0 12px}
+.sSearch .inp{padding:8px 10px; font-size:12.5px}
+.navHide{display:none!important}
+.app.rail .sLogo{display:none}
+.app.rail .side{padding-top:16px}
+.sShade{display:none}
+.lHead{display:flex; align-items:center; gap:14px; margin-bottom:18px; flex-wrap:wrap}
+.lHead h2{margin:0}
+.fChips{display:flex; gap:6px; flex-wrap:wrap}
+.fChips button{border:0; background:var(--blue-soft); color:var(--blue); border-radius:20px; padding:4px 10px; font-size:11.5px; font-weight:500; display:flex; gap:6px; align-items:center}
+.fChips button b{font-weight:400; opacity:.7}
+.lHead .lSearch{margin-left:auto; width:300px}
+.previewWrap{background:var(--bg)}
 .top{display:flex; align-items:center; gap:14px; padding:10px 18px; padding-top:calc(10px + env(safe-area-inset-top,0px)); background:var(--panel); border-bottom:1px solid var(--line); flex-wrap:wrap}
 .logo{display:flex; align-items:center; gap:10px; font-weight:600; font-size:15px}
 .logo .mark{background:var(--blue); color:#fff; font-weight:500; font-size:13px; padding:6px 10px; border-radius:8px 8px 8px 0}
@@ -84,12 +161,12 @@ button{cursor:pointer}
 .clearF{margin-left:auto}
 .tblScroll{overflow-x:auto; border-radius:12px}
 .oTable{width:100%; border-collapse:separate; border-spacing:0; background:var(--panel); border:1px solid var(--line); border-radius:12px; overflow:hidden; font-size:13px}
-.oTable th{text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); font-weight:600; padding:10px 12px; background:var(--bg); border-bottom:1px solid var(--line); white-space:nowrap; cursor:pointer; user-select:none}
+.oTable th{text-align:left; font-size:10px; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); font-weight:600; padding:10px 12px; background:var(--bg); border-bottom:1px solid var(--line); white-space:nowrap; cursor:pointer; user-select:none}
 .oTable th.noSort{cursor:default}
 .oTable th .ar{opacity:.35; margin-left:3px}
 .oTable th.sorted{color:var(--blue)} .oTable th.sorted .ar{opacity:1}
 .oTable th.n,.oTable td.n{text-align:right}
-.oTable td{padding:11px 10px; border-bottom:1px solid var(--line); vertical-align:middle}
+.oTable td{padding:10px 8px; border-bottom:1px solid var(--line); vertical-align:middle}
 .oTable tbody tr{cursor:pointer}
 .oTable tbody tr:hover td{background:var(--blue-soft)}
 .oTable tbody tr:last-child td{border-bottom:0}
@@ -97,7 +174,9 @@ button{cursor:pointer}
 .oTable .num{font-variant-numeric:tabular-nums; white-space:nowrap; font-size:12px; font-weight:500}
 .oTable .num span{color:var(--muted); font-weight:400}
 .oTable .cl{font-weight:600}
-.oTable .ref{font-size:11.5px; color:var(--muted); margin-top:1px; max-width:250px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.oTable .ref{font-size:11.5px; color:var(--muted); margin-top:1px; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+@media (max-width:1400px){ .oTable .ref{max-width:150px} .view{padding-left:16px; padding-right:16px} .oTable td,.oTable th{padding-left:7px; padding-right:7px} }
+.oTable .dt small{display:block; color:var(--muted); font-size:11px; margin-top:1px}
 .oTable .dt{white-space:nowrap; font-variant-numeric:tabular-nums; font-size:12.5px}
 .oTable td.n{font-variant-numeric:tabular-nums; white-space:nowrap}
 .oTable .ow{white-space:nowrap; font-size:12.5px}
@@ -206,7 +285,7 @@ button{cursor:pointer}
 .qLink{display:flex; align-items:center; gap:8px; background:var(--blue-soft); color:var(--blue); border-radius:9px; padding:8px 12px; font-size:12.5px; margin-bottom:10px}
 .qLink .linkBtn{margin-left:auto}
 
-.bar{position:fixed; left:0; bottom:0; width:min(var(--formW,clamp(460px,38vw,640px)),100%); padding:12px 18px calc(12px + env(safe-area-inset-bottom,0px)); background:var(--panel); border-top:1px solid var(--line); display:flex; gap:8px; z-index:5}
+.bar{position:fixed; left:var(--railW,0px); bottom:0; width:min(var(--formW,clamp(460px,38vw,640px)),100%); padding:12px 18px calc(12px + env(safe-area-inset-bottom,0px)); background:var(--panel); border-top:1px solid var(--line); display:flex; gap:8px; z-index:5}
 .bar .grow{flex:1}
 
 /* ── popup menu, modal, toast ── */
@@ -223,6 +302,12 @@ button{cursor:pointer}
 .mCard header h3{margin:0; font-size:16px; font-weight:600}
 .mCard header .x{margin-left:auto}
 .mCard .mBody{padding:0 18px 18px; overflow:auto}
+.clList{display:flex; flex-direction:column; gap:6px; margin:10px 0 14px}
+.clList button{display:grid; grid-template-columns:1fr auto; gap:2px 12px; text-align:left; border:1px solid var(--line); background:var(--panel); border-radius:10px; padding:10px 12px}
+.clList button:hover{border-color:var(--blue); background:var(--blue-soft)}
+.clList b{font-weight:600}
+.clList span{font-size:12px; color:var(--muted)}
+.clList .code{font-size:11px; font-weight:600; color:var(--blue); background:var(--grey-soft); border-radius:6px; padding:2px 8px; justify-self:end}
 .qPick{display:flex; flex-direction:column; gap:6px; margin-top:10px}
 .qPick button{display:grid; grid-template-columns:1fr auto; gap:2px 12px; text-align:left; border:1px solid var(--line); background:var(--panel); border-radius:10px; padding:10px 12px}
 .qPick button:hover{border-color:var(--blue); background:var(--blue-soft)}
@@ -403,13 +488,22 @@ button{cursor:pointer}
   .mobileSwitch{display:flex; gap:4px; padding:8px 12px; background:var(--panel); border-bottom:1px solid var(--line)}
   .mobileSwitch button{flex:1; border:1px solid var(--line); background:var(--panel); border-radius:8px; padding:8px; font-size:13px}
   .mobileSwitch button.on{background:var(--blue); color:#fff; border-color:var(--blue)}
-  .bar{width:100%}
-  .nav{margin-left:0; width:100%}
-  .nav button{flex:1; justify-content:center; padding:7px 6px}
-  .who{display:none}
-  .nav{order:3}
-  #bLogout{margin-left:auto}
-  .logo span{display:none}
+  .bar{width:100%; left:0}
+  .side{position:fixed; left:0; top:0; bottom:0; z-index:70; transform:translateX(-105%); transition:transform .2s}
+  .app.open .side{transform:none; box-shadow:0 10px 40px rgba(20,30,80,.25)}
+  .app.open .sShade{display:block; position:fixed; inset:0; z-index:65; background:rgba(16,19,31,.35)}
+  .app.rail .side{width:250px} .app.rail .side .lt,.app.rail .side .cnt,.app.rail .wTxt{display:revert} .app.rail .sFilters{display:none}
+  .app.rail .sLogo .mark{font-size:13px; width:auto; height:auto; padding:6px 10px} .app.rail .sLogo .mark::after{content:none}
+  .app.rail .sNew,.app.rail .side .nav button{justify-content:flex-start; padding-left:10px} .app.rail .sUser{flex-direction:row}
+  .mTopOld{display:flex; align-items:center; gap:10px; padding:10px 14px; padding-top:calc(10px + env(safe-area-inset-top,0px)); border-bottom:1px solid var(--line); background:var(--panel)}
+  .mTop .logo{display:flex; align-items:center; gap:8px; font-weight:600}
+  .burger{display:block; border:1px solid var(--line); background:var(--panel); border-radius:4px; width:36px; height:36px; font-size:16px; flex:0 0 auto}
+  .tBar{padding:8px 12px; gap:10px}
+  .tBar{flex-wrap:wrap}
+  .tNav{overflow-x:auto; flex:1; min-width:0}
+  .tNav button{padding:6px 7px; font-size:13px}
+  .tBar .tSearch{width:100%; margin-left:0; order:3}
+  .lHead .lSearch{width:100%; margin-left:0}
   .tblScroll{overflow:visible}
   .kpis{grid-template-columns:1fr 1fr}
   .fRow{grid-template-columns:1fr 1fr}
@@ -439,6 +533,23 @@ button{cursor:pointer}
 }
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 
+/* hranatejšie tlačidlá */
+.btn,.sNew,.side .nav button,.fi,.seg,.tile,.add,.acts button,.st,.stSeg button,.yn button,.mv,.x,.sOut,.fChips button,.fClr,.menu button,.qPick button,.clList button,.mobileSwitch button,.fi .code,.side .nav .cnt{border-radius:4px!important}
+.yn,.menu{border-radius:6px!important}
+.inp,.fld input,.fld textarea,.fld select,.cell{border-radius:5px!important}
+.tile .box{border-radius:3px!important}
+
+/* kompaktnejšie bočné menu */
+.sNew{padding:7px 12px!important; font-size:13px!important; margin-bottom:10px!important}
+.sNew svg{width:15px!important; height:15px!important}
+.fi{padding:3px 10px!important; font-size:12.5px!important}
+.fh{margin:10px 6px 3px!important}
+.sSel{padding:5px 8px!important; font-size:12px!important; margin-bottom:5px!important}
+.flt{margin-bottom:4px!important}
+.sLogo{margin-bottom:12px!important}
+.tBar{min-height:50px!important; padding-top:7px!important; padding-bottom:7px!important}
+.tBar .tSearch{padding:6px 12px!important}
+
 /* tlač / vektorové PDF */
 @page{size:A4; margin:0}
 @media print{
@@ -454,16 +565,34 @@ button{cursor:pointer}
 </style>
 </head>
 <body>
-<div class="app">
-  <header class="top">
-    <div class="logo"><div class="mark">Cromwell</div> Objednávky <span id="storeMode"></span></div>
-    <nav class="nav" aria-label="Sekcie">
-      <button data-view="list" class="on">Evidencia <span class="cnt" id="navCnt">0</span></button>
-      <button data-view="editor">Objednávka</button>
-      <button data-view="profile">Môj profil</button>
-    </nav>
-    <div class="who" id="whoTop"></div>
-    <button class="btn sm" id="bLogout" type="button">Odhlásiť</button>
+<div class="app" id="app">
+  <aside class="side" id="side">
+    <div class="sLogo"><div class="mark">Cromwell</div><span class="lt">Objednávky</span></div>
+    <button class="sNew" id="bNewL" type="button" title="Nová objednávka"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg><span class="lt">Nová objednávka</span></button>
+    <div class="sFilters" id="sFilters">
+      <div class="fh">Obchodník a mesiac <button class="fClr" id="fClear" type="button" hidden></button></div>
+      <select class="inp sSel" id="fOwner" aria-label="Obchodník"></select>
+      <select class="inp sSel" id="fMonth" aria-label="Mesiac distribúcie"></select>
+      <div class="fh">Klient</div>
+      <div class="flt" id="fClient"></div>
+      <div class="fh">Stav</div>
+      <div class="flt" id="fStatus"></div>
+      <div class="fh">Služba</div>
+      <div class="flt" id="fSvc"></div>
+    </div>
+    <div class="sUser">
+      <div class="av" id="whoAv"></div>
+      <div class="lt wTxt"><b id="whoName"></b><small id="whoPos"></small><small id="storeMode"></small></div>
+      <button class="sOut" id="bLogout" type="button" title="Odhlásiť"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/></svg><span class="lt">Odhlásiť</span></button>
+    </div>
+  </aside>
+  <div class="sShade" id="sShade"></div>
+  <div class="content">
+  <header class="tBar">
+    <button class="burger" id="bMenu" type="button" aria-label="Menu">☰</button>
+    <nav class="tNav"><button data-view="list" class="on" type="button">Evidencia <span class="cnt" id="swCnt">0</span></button><i></i><button data-view="editor" type="button">Objednávka</button><i></i><button id="bClients" type="button">Stáli klienti <span class="cnt" id="clCnt">0</span></button><i></i><button data-view="profile" type="button">Môj profil</button></nav>
+    <div class="fChips" id="fChips" hidden></div>
+    <input class="inp tSearch" id="fSearch" placeholder="Hľadať klienta, názov alebo číslo…" aria-label="Hľadať">
   </header>
   <div class="demoBar" id="demoBar" hidden>Skúšobný režim — objednávky sa ukladajú len v tomto prehliadači. Ostrá verzia beží po prihlásení cez Zappis účet.</div>
 
@@ -471,23 +600,6 @@ button{cursor:pointer}
     <!-- EVIDENCIA -->
     <div class="view" id="vList">
       <div class="wrapL">
-        <div class="lHead">
-          <div><h2>Evidencia objednávok</h2><p>Vaše objednávky a objednávky kolegov z oddelení, ktorých služby obsahujú. Kliknutím na riadok objednávku otvoríte.</p></div>
-          <button class="btn primary" id="bNewL">+ Nová objednávka</button>
-        </div>
-        <div class="kpis" id="kpis"></div>
-        <div class="fCard">
-          <div class="fRow">
-            <input class="inp" id="fSearch" placeholder="Hľadať klienta, názov alebo číslo objednávky…">
-            <select class="inp" id="fOwner" aria-label="Obchodník"></select>
-            <select class="inp" id="fMonth" aria-label="Mesiac distribúcie"></select>
-            <button class="btn sm clearF" id="fClear" hidden></button>
-          </div>
-          <div class="fSegs">
-            <div class="fGroup" id="fStatus"></div>
-            <div class="fGroup" id="fSvc"></div>
-          </div>
-        </div>
         <div id="oList"></div>
       </div>
     </div>
@@ -542,6 +654,7 @@ button{cursor:pointer}
   </div>
 </div>
 
+</div>
 <div id="stage" aria-hidden="true"></div>
 
 <div class="modal" id="mQuote" hidden>
@@ -552,6 +665,13 @@ button{cursor:pointer}
       <input class="inp" id="mQs" placeholder="Hľadať klienta alebo číslo ponuky…">
       <div class="qPick" id="mQl"></div>
     </div>
+  </div>
+</div>
+
+<div class="modal" id="mCl" hidden>
+  <div class="mCard" role="dialog" aria-modal="true" aria-labelledby="mClT">
+    <header><h3 id="mClT">Stáli klienti</h3><button class="x" data-close>×</button></header>
+    <div class="mBody" id="mClB"></div>
   </div>
 </div>
 
@@ -594,8 +714,6 @@ const SVCS = [
 const STATUSES = [
   {k:"draft",     l:"Rozpracovaná",       c:"#E0A100"},
   {k:"sent",      l:"Odoslaná klientovi", c:"#3552CC"},
-  {k:"confirmed", l:"Potvrdená",          c:"#1E9E5A"},
-  {k:"done",      l:"Zrealizovaná",       c:"#7A8199"},
   {k:"cancelled", l:"Zrušená",            c:"#C9302C"}
 ];
 const AD_TYPES   = ["Marketingová adresná zásielka PLUS (MaZ+)","Marketingová adresná zásielka (MaZ)","Marketingová listová zásielka","Transakčná listová zásielka"];
@@ -636,7 +754,9 @@ function fmtStamp(iso){ if(!iso) return ""; const d=new Date(iso); return d.toLo
 function plain(s){ return String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase(); }
 /* jednoduché formátovanie v textoch: **tučné**, ==zvýraznené modrou== */
 function rt(s){ return esc(s).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/==(.+?)==/g,'<b class="hl">$1</b>'); }
-const stOf = k => STATUSES.find(s=>s.k===k) || STATUSES[0];
+/* staré stavy (potvrdená, zrealizovaná) sa zobrazujú ako „Odoslaná klientovi“ */
+const stKey = k => (k==="confirmed"||k==="done")? "sent" : (STATUSES.some(s=>s.k===k)? k : "draft");
+const stOf = k => STATUSES.find(s=>s.k===stKey(k));
 const svcDef = k => SVCS.find(s=>s.key===k);
 const lsGet = k => { try{ return JSON.parse(localStorage.getItem("obj:"+k)||"null"); }catch(e){ return null; } };
 const lsSet = (k,v) => { try{ localStorage.setItem("obj:"+k, JSON.stringify(v)); }catch(e){} };
@@ -651,7 +771,7 @@ const firebaseConfig = {
   appId:             "1:998598557554:web:dcf8a546fcf8423386e7eb"
 };
 const FBV="10.14.1";
-const ORD_COL="objednavky", CP_COL="cenovePonuky", CP_PROF="cpProfiles";
+const ORD_COL="objednavky", CP_COL="cenovePonuky", CP_PROF="cpProfiles", CL_COL="objKlienti";
 const DEPT_NAME={ad:"Adresné", nad:"Neadresné", tlac:"Tlač", baliky:"Balíky", digital:"Digitálne", zelena:"Zelená pošta"};
 function orderDepts(o){ const d=new Set(); (o.services||[]).filter(s=>s.on).forEach(s=>{ const x=svcDef(s.key); if(x) d.add(x.dept); }); if(!d.size) d.add("ad"); return [...d]; }
 
@@ -714,6 +834,25 @@ const Store = {
       const data=stamp(old); tx.set(ref,data); return data;
     });
   },
+  /* stáli klienti – spoločný zoznam pre všetkých, s vlastným číselným radom po rokoch */
+  async listClients(){
+    if(this.demo) return Object.values(lsGet("klienti")||{});
+    const {collection,getDocs}=this.m; const snap=await getDocs(collection(this.db,CL_COL)); return snap.docs.map(d=>d.data());
+  },
+  async saveClient(c){
+    c=JSON.parse(JSON.stringify(c));
+    if(this.demo){ const all=lsGet("klienti")||{}; const old=all[c.id]||{}; all[c.id]=Object.assign(old,c,{seq:Object.assign({},old.seq,c.seq)}); lsSet("klienti",all); return; }
+    const {doc,setDoc}=this.m; return setDoc(doc(this.db,CL_COL,c.id), c, {merge:true});
+  },
+  async deleteClient(id){
+    if(this.demo){ const all=lsGet("klienti")||{}; delete all[id]; lsSet("klienti",all); return; }
+    const {doc,deleteDoc}=this.m; return deleteDoc(doc(this.db,CL_COL,id));
+  },
+  async nextClientSeq(id, year){
+    if(this.demo){ const all=lsGet("klienti")||{}, c=all[id]; c.seq=c.seq||{}; const n=(+c.seq[year]||0)+1; c.seq[year]=n; lsSet("klienti",all); return n; }
+    const {doc,runTransaction}=this.m, ref=doc(this.db,CL_COL,id);
+    return runTransaction(this.db, async tx=>{ const snap=await tx.get(ref); const seq=(snap.exists() && snap.data().seq)||{}; const n=(+seq[year]||0)+1; tx.set(ref,{seq:{[year]:n}},{merge:true}); return n; });
+  },
   async deleteOrder(id){
     if(this.demo){ const all=lsGet("orders")||{}; delete all[id]; lsSet("orders",all); return; }
     const {doc,deleteDoc}=this.m; return deleteDoc(doc(this.db,ORD_COL,id));
@@ -731,7 +870,9 @@ const Store = {
 };
 
 /* ════════════════ stav ════════════════ */
-let profile=null, O=null, dirty=false, allOrders=[], listLoaded=false;
+let profile=null, O=null, dirty=false, allOrders=[], listLoaded=false, clients=[];
+const clientById = id => id ? clients.find(c=>c.id===id) : null;
+const blankClient = () => ({name:"",person:"",address:"",ico:"",icdph:"",dic:"",email:"",phone:""});
 
 function blankProfile(){ return {first:"",last:"",title:"",position:"",phone:"",email:"",company:"Cromwell a.s.",address:"Lamačská cesta 22, 841 03 Bratislava",ico:COMPANY.ico,icdph:COMPANY.icdph,dic:COMPANY.dic,objSeq:0}; }
 function fullName(p){ return [p.title,p.first,p.last].filter(Boolean).join(" "); }
@@ -749,7 +890,7 @@ function blankAd(){ return spNormAd({
 function spNormAd(d){ return d; }
 function newOrder(){ return {
   id:newId(), number:null, date:todayISO(), status:"draft", saved:false,
-  title:"", titleAuto:true, code:"", note:"", noteDoc:"",
+  title:"", titleAuto:true, code:"", note:"", noteDoc:"", clientKey:"", clientSeq:null,
   client:{name:"",person:"",address:"",ico:"",icdph:"",dic:"",email:"",phone:""},
   supplierPerson:"", quoteRef:null,
   intro:"", introAuto:true,
@@ -788,15 +929,15 @@ function adTotal(d){ let t=0, any=false; d.rows.forEach(r=>{ const v=rowTotal(d,
 function adQty(d){ const c=effCount(d); if(!isNaN(c)) return c; let t=0; d.rows.forEach(r=>{ const q=num(r.qty); if(!isNaN(q)) t+=q; }); return t||NaN; }
 function summaryOf(o){
   const act=activeSvcs(o), d=svc("ad",o)?.on? AD(o) : null;
-  return { client:o.client.name, title:o.title, services:act.map(s=>svcDef(s.key).name), keys:act.map(s=>s.key),
+  return { client:o.client.name, clientKey:o.clientKey||"", title:o.title, services:act.map(s=>svcDef(s.key).name), keys:act.map(s=>s.key),
     count: d? (adQty(d)||0) : 0, total: d? (adTotal(d)||0) : 0,
     delivery:d?.delivery||"", distFrom:d?.distFrom||"", distTo:d?.distTo||"" };
 }
 function suggestTitle(o=O){
   const d=AD(o), ref=d.distFrom||d.delivery||o.date||todayISO(), [y,m]=ref.split("-");
   const brand=(d.item||o.client.name||"KLIENT").trim().toUpperCase();
-  const cl=plain(o.client.name);
-  const nn=cl? allOrders.filter(x=>x.id!==o.id && plain(x.client?.name)===cl && (x.date||"").slice(0,4)===y && x.status!=="cancelled").length+1 : 1;
+  const cl=plain(o.client.name), kc=clientById(o.clientKey), ky=(o.date||todayISO()).slice(0,4);
+  const nn= kc? (o.clientSeq || ((+kc.seq?.[ky]||0)+1)) : cl? allOrders.filter(x=>x.id!==o.id && plain(x.client?.name)===cl && (x.date||"").slice(0,4)===y && x.status!=="cancelled").length+1 : 1;
   return `${String(nn).padStart(2,"0")}_${y}_Objednávka – ${brand}${o.code?"_"+o.code.trim():""}_${MONTHS[+m-1]}_${y}`;
 }
 function introText(o=O){ if(!o.introAuto && o.intro.trim()) return o.intro; return DEF_INTRO.replace("{nazov}", (AD(o).item||o.client.name||"…").trim()); }
@@ -820,7 +961,7 @@ function yn(p, opts){ const v=getP(p); return `<div class="yn">${opts.map(([k,l]
 
 function renderForm(){
   const f=$("#form"), sc=f.scrollTop, P=orderProfile(), d=AD(), ai=O.services.findIndex(s=>s.key==="ad"), A=`services.${ai}.d`;
-  const st=stOf(O.status);
+  const st=stOf(O.status); O.status=stKey(O.status);
   let h=`<div class="oBanner"><div class="no">${O.number?esc(O.number):"Nová objednávka"}<small>${O.saved?"Uložená":"Zatiaľ neuložená"}${O.quoteRef?` · z ponuky ${esc(O.quoteRef.number||"")}`:""}</small></div>
     <div class="meta">${O.updatedAt?`Upravené ${esc(fmtStamp(O.updatedAt))}<br>${esc(O.updatedByName||"")}`:""}${O.ownerName&&O.ownerUid!==Store.uid?`<br>Autor: ${esc(O.ownerName)}`:""}</div></div>
     <div class="stSeg">${STATUSES.map(s=>`<button type="button" data-status="${s.k}" class="${O.status===s.k?"on":""}"><i style="background:${s.c}"></i>${s.l}</button>`).join("")}</div>`;
@@ -834,6 +975,11 @@ function renderForm(){
 
   h += card("klient",2,"Objednávateľ","klient",
     `${O.quoteRef?`<div class="qLink">Prepojené s cenovou ponukou <b>${esc(O.quoteRef.number||"")}</b><button class="linkBtn" type="button" data-act="unlinkQuote">zrušiť prepojenie</button></div>`:""}
+     <div class="fld"><label>Klient v evidencii</label><div class="inline"><select data-p="clientKey" data-rr>
+       <option value="">Ostatní klienti (bežné číslovanie)</option>
+       ${clients.filter(c=>!c.archived || c.id===O.clientKey).sort((a,b)=>a.name.localeCompare(b.name,"sk")).map(c=>`<option value="${esc(c.id)}" ${c.id===O.clientKey?"selected":""}>${esc(c.name)} · ${esc(c.code)}</option>`).join("")}
+       </select><button class="btn sm" type="button" data-act="clientNew" title="Uložiť tohto klienta medzi stálych klientov">+ Stály klient</button></div>
+       <div class="hint" style="margin:2px 0 0">${clientById(O.clientKey)? (O.number? `Číslo objednávky: <b>${esc(O.number)}</b>` : `Pri uložení dostane číslo <b>${esc(clientById(O.clientKey).code)}-${(O.date||todayISO()).slice(0,4)}-${String((+clientById(O.clientKey).seq?.[(O.date||todayISO()).slice(0,4)]||0)+1).padStart(2,"0")}</b>`) : "Stálemu klientovi sa objednávky číslujú vlastným radom a zoskupia sa v evidencii."}</div></div>
      <button class="add" type="button" data-act="fromQuote" style="margin-bottom:12px">⇣ Načítať klienta a ceny z cenovej ponuky</button>
      ${fld("Názov spoločnosti","client.name",{list:"dlClients",ph:"napr. XLSK Nábytok, s.r.o. / Möbelix"})}
      <div class="grid2">${fld("Kontaktná osoba","client.person")}${fld("Adresa","client.address",{ph:"Ulica č., PSČ Mesto"})}</div>
@@ -953,6 +1099,10 @@ form.addEventListener("input", e=>{
 form.addEventListener("change", e=>{
   const el=e.target.closest("[data-p]"); if(!el) return;
   if(el.dataset.p==="client.name") fillClient(el.value);
+  if(el.dataset.p==="clientKey"){ const kc=clientById(el.value);
+    if(kc){ O.client=Object.assign(blankClient(), kc.client||{}); if(!O.client.name) O.client.name=kc.name; }
+    if(O.number) toast("Objednávka už má pridelené číslo "+O.number+" – zostane nezmenené.",4000);
+    if(O.titleAuto) O.title=""; }
   if(el.hasAttribute("data-rr")){ const d=AD(); if(d.split.on && d.split.rows.length===1 && !d.split.rows[0].w && d.weight) d.split.rows[0].w=d.weight; renderForm(); schedulePreview(); }
 });
 form.addEventListener("click", e=>{
@@ -977,6 +1127,7 @@ form.addEventListener("click", e=>{
   else if(a==="autoTitle"){ O.titleAuto=true; O.title=""; }
   else if(a==="autoIntro"){ O.introAuto=true; O.intro=""; }
   else if(a==="fromQuote"){ openQuotePicker(); return; }
+  else if(a==="clientNew"){ openClients({_new:true, name:(AD().item||O.client.name||"").trim(), code:"", client:clone(O.client), seq:{}}, c=>{ O.clientKey=c.id; dirty=true; renderForm(); schedulePreview(); }); return; }
   else if(a==="unlinkQuote"){ O.quoteRef=null; }
   else if(a==="profile"){ show("profile"); return; }
   dirty=true; renderForm(); schedulePreview();
@@ -1141,7 +1292,10 @@ async function makePdf(){
 async function saveOrder(silent, force){
   if(!profile.first){ toast("Najprv vyplňte svoj profil."); show("profile"); return false; }
   try{
-    if(!O.number){ O.number=nextNumber(); profile.objSeq=(profile.objSeq||0)+1; await Store.setProfile({objSeq:profile.objSeq}); }
+    if(!O.number){ const kc=clientById(O.clientKey);
+      if(kc){ const y=(O.date||todayISO()).slice(0,4); const n=await Store.nextClientSeq(kc.id,y); kc.seq=Object.assign({},kc.seq,{[y]:n});
+        O.clientSeq=n; O.number=`${kc.code}-${y}-${String(n).padStart(2,"0")}`; }
+      else { O.number=nextNumber(); profile.objSeq=(profile.objSeq||0)+1; await Store.setProfile({objSeq:profile.objSeq}); } }
     if(O.titleAuto || !O.title.trim()){ O.title=suggestTitle(); O.titleAuto=false; }
     if(!O.ownerUid || O.ownerUid===Store.uid){ const p=profile; O.author={first:p.first,last:p.last,title:p.title,position:p.position,phone:p.phone,email:p.email,company:p.company,address:p.address,ico:p.ico,icdph:p.icdph,dic:p.dic}; }
     O.saved=true; O.summary=summaryOf(O);
@@ -1174,22 +1328,24 @@ function bumpTitle(t){
 function copyOrder(src, nextMonth){
   const o=migrate(clone(src));
   ["version","ownerUid","ownerName","createdAt","updatedAt","updatedByUid","updatedByName","depts","summary","author"].forEach(k=>delete o[k]);
-  Object.assign(o,{id:newId(), number:null, saved:false, status:"draft", date:todayISO()});
+  Object.assign(o,{id:newId(), number:null, clientSeq:null, saved:false, status:"draft", date:todayISO()});
   if(nextMonth){
     o.services.forEach(s=>{ if(s.key==="ad"){ ["delivery","distFrom","distTo","spDate"].forEach(k=>{ if(s.d[k]) s.d[k]=addMonths(s.d[k],1); }); } });
-    if(o.title){ o.title=bumpTitle(o.title); o.titleAuto=false; }
+    if(clientById(o.clientKey)){ o.title=""; o.titleAuto=true; }   // stály klient – názov sa vytvorí z jeho číselného radu
+    else if(o.title){ o.title=bumpTitle(o.title); o.titleAuto=false; }
   } else if(o.title){ o.title=o.title; }
   return o;
 }
 
 /* ════════════════ evidencia ════════════════ */
-const F = Object.assign({q:"", owner:"", month:"", status:"", svc:"", sort:{k:"date",d:-1}}, lsGet("filters")||{}, {q:""});
+const F = Object.assign({q:"", owner:"", month:"", status:"", svc:"", client:"", sort:{k:"date",d:-1}}, lsGet("filters")||{}, {q:""});
 async function loadOrders(){
+  try{ clients=await Store.listClients(); }catch(e){ console.warn("Stáli klienti sa nenačítali:",e); clients=[]; }
   try{ allOrders=await Store.listOrders(); listLoaded=true; }
   catch(e){ console.error(e); allOrders=[]; toast(e.code==="permission-denied"?"Nemáte prístup ku kolekcii „objednavky“ – treba doplniť pravidlá vo Firestore.":"Evidenciu sa nepodarilo načítať.",6000); }
   updateCount();
 }
-function updateCount(){ $("#navCnt").textContent=allOrders.length; }
+function updateCount(){ $("#swCnt").textContent=allOrders.length; }
 async function renderList(reload){
   if(reload || !listLoaded){ $("#oList").innerHTML=`<div class="empty">Načítavam…</div>`; await loadOrders(); }
   drawList();
@@ -1198,7 +1354,8 @@ const S = x => x.summary || summaryOf(migrate(clone(x)));
 const monthOf = x => { const s=S(x); return (s.distFrom||s.delivery||x.date||"").slice(0,7); };
 const monthLbl = ym => { const [y,m]=ym.split("-"); return MONTHS[+m-1]+" "+y; };
 function drawList(){
-  lsSet("filters",{owner:F.owner, month:F.month, status:F.status, svc:F.svc, sort:F.sort});
+  lsSet("filters",{owner:F.owner, month:F.month, status:F.status, svc:F.svc, client:F.client, sort:F.sort});
+  if(F.client && F.client!=="_other" && !clientById(F.client)) F.client="";
   const q=plain(F.q);
   // výber obchodníka a mesiaca
   const owners=[...new Set(allOrders.map(x=>x.ownerName||"—"))].sort((a,b)=>a.localeCompare(b,"sk"));
@@ -1211,47 +1368,52 @@ function drawList(){
     if(q && ![x.number, x.client?.name, x.title, s.title, x.code].some(v=>plain(v).includes(q))) return false;
     if(F.owner && (x.ownerName||"—")!==F.owner) return false;
     if(F.month && monthOf(x)!==F.month) return false; return true; });
-  const bySt=F.status? base.filter(x=>(x.status||"draft")===F.status) : base;
-  const bySv=F.svc? base.filter(x=>S(x).keys?.includes(F.svc)) : base;
-  $("#fStatus").innerHTML=`<em>Stav</em><button class="seg ${F.status?"":"on"}" data-fst="">Všetky<span>${bySv.length}</span></button>`+STATUSES.map(s=>{ const n=bySv.filter(x=>(x.status||"draft")===s.k).length; return `<button class="seg ${F.status===s.k?"on":""} ${n?"":"zero"}" data-fst="${s.k}"><i style="background:${s.c}"></i>${s.l}<span>${n}</span></button>`; }).join("");
-  $("#fSvc").innerHTML=`<em>Služba</em>`+SVCS.map(s=>{ const n=bySt.filter(x=>S(x).keys?.includes(s.key)).length; return `<button class="seg ${F.svc===s.key?"on":""} ${n?"":"zero"}" data-fsv="${s.key}">${s.name}<span>${n}</span></button>`; }).join("");
-  let list=base.filter(x=>(!F.status || (x.status||"draft")===F.status) && (!F.svc || S(x).keys?.includes(F.svc)));
-  const nAct=[F.q,F.owner,F.month,F.status,F.svc].filter(Boolean).length;
+  const fSt=x=>!F.status || stKey(x.status)===F.status, fSv=x=>!F.svc || S(x).keys?.includes(F.svc);
+  const isOther=x=>!clientById(x.clientKey), fCl=x=>!F.client || (F.client==="_other"? isOther(x) : x.clientKey===F.client);
+  const bySt=base.filter(x=>fSt(x)&&fCl(x)), bySv=base.filter(x=>fSv(x)&&fCl(x)), byCl=base.filter(x=>fSt(x)&&fSv(x));
+  const kcs=clients.filter(c=>!c.archived).sort((a,b)=>a.name.localeCompare(b.name,"sk"));
+  $("#fClient").innerHTML=`<button class="fi ${F.client?"":"on"}" data-fcl="">Všetci<span class="n">${byCl.length}</span></button>`+
+    kcs.map(c=>{ const n=byCl.filter(x=>x.clientKey===c.id).length; return `<button class="fi ${F.client===c.id?"on":""} ${n?"":"zero"}" data-fcl="${esc(c.id)}" title="${esc(c.client?.name||c.name)}">${esc(c.name)} <span class="code">${esc(c.code)}</span><span class="n">${n}</span></button>`; }).join("")+
+    (()=>{ const n=byCl.filter(isOther).length; return `<button class="fi ${F.client==="_other"?"on":""} ${n?"":"zero"}" data-fcl="_other">Ostatní klienti<span class="n">${n}</span></button>`; })();
+  $("#fStatus").innerHTML=`<button class="fi ${F.status?"":"on"}" data-fst="">Všetky<span class="n">${bySv.length}</span></button>`+STATUSES.map(s=>{ const n=bySv.filter(x=>stKey(x.status)===s.k).length; return `<button class="fi ${F.status===s.k?"on":""} ${n?"":"zero"}" data-fst="${s.k}"><i style="background:${s.c}"></i>${s.l}<span class="n">${n}</span></button>`; }).join("");
+  $("#fSvc").innerHTML=SVCS.map(s=>{ const n=bySt.filter(x=>S(x).keys?.includes(s.key)).length; return `<button class="fi ${F.svc===s.key?"on":""} ${n?"":"zero"}" data-fsv="${s.key}">${s.name}<span class="n">${n}</span></button>`; }).join("");
+  let list=base.filter(x=>fSt(x)&&fSv(x)&&fCl(x));
+  const nAct=[F.q,F.owner,F.month,F.status,F.svc,F.client].filter(Boolean).length;
   $("#fClear").hidden=!nAct; $("#fClear").textContent=`Zrušiť filtre (${nAct})`;
-  // súhrn
-  const live=list.filter(x=>x.status!=="cancelled");
-  const sumQ=live.reduce((a,x)=>a+(+S(x).count||0),0), sumE=live.reduce((a,x)=>a+(+S(x).total||0),0);
-  const soonN=list.filter(x=>{ const dd=daysTo(S(x).delivery); return ["draft","sent","confirmed"].includes(x.status||"draft") && dd>=0 && dd<=7; }).length;
-  $("#kpis").innerHTML=`<div class="kpi"><span>Objednávky</span><b>${list.length}</b><small>${live.length!==list.length?`${list.length-live.length} zrušených`:"vo výbere"}</small></div>
-    <div class="kpi"><span>Zásielok spolu</span><b>${fmtInt(sumQ)||0}</b><small>ks, bez zrušených</small></div>
-    <div class="kpi"><span>Suma bez DPH</span><b>${fmtSum(sumE)}</b><small>bez zrušených</small></div>
-    <div class="kpi"><span>Dodanie do 7 dní</span><b>${soonN}</b><small>otvorené objednávky</small></div>`;
+  const chips=[]; const kc=clientById(F.client);
+  if(F.client) chips.push(["client", F.client==="_other"?"Ostatní klienti":kc?.name]);
+  if(F.status) chips.push(["status", stOf(F.status).l]); if(F.svc) chips.push(["svc", svcDef(F.svc)?.name]);
+  if(F.owner) chips.push(["owner", F.owner]); if(F.month) chips.push(["month", monthLbl(F.month)]);
+  $("#fChips").innerHTML=chips.map(([k,l])=>`<button type="button" data-chip="${k}" title="Zrušiť filter">${esc(l||"")} <b>×</b></button>`).join("");
+  $("#clCnt").textContent=clients.filter(c=>!c.archived).length;
   // tabuľka
-  const val={num:x=>x.number||"", cl:x=>plain(x.client?.name), date:x=>x.date||"", del:x=>S(x).delivery||"", dist:x=>S(x).distFrom||S(x).distTo||"", cnt:x=>+S(x).count||0, sum:x=>+S(x).total||0, st:x=>STATUSES.findIndex(s=>s.k===(x.status||"draft")), own:x=>plain(x.ownerName)};
+  const val={num:x=>x.number||"", cl:x=>plain(x.client?.name), date:x=>x.date||"", del:x=>S(x).delivery||"", dist:x=>S(x).distFrom||S(x).distTo||"", cnt:x=>+S(x).count||0, sum:x=>+S(x).total||0, st:x=>STATUSES.findIndex(s=>s.k===stKey(x.status)), own:x=>plain(x.ownerName)};
   const f=val[F.sort.k]||val.date; list=[...list].sort((a,b)=>{ const A=f(a),B=f(b); return (A<B?-1:A>B?1:0)*F.sort.d || (b.updatedAt||"").localeCompare(a.updatedAt||""); });
   const box=$("#oList");
   if(!list.length){ box.innerHTML=allOrders.length? `<div class="empty">Nič sa nenašlo – skúste zmeniť filter.</div>` : `<div class="empty">Zatiaľ tu nie je žiadna objednávka.<br><button class="btn primary" data-new>+ Vytvoriť prvú objednávku</button></div>`; return; }
   const th=(k,l,cls="")=>`<th data-sort="${k}" class="${cls} ${F.sort.k===k?"sorted":""}">${l}<span class="ar">${F.sort.k===k?(F.sort.d>0?"↑":"↓"):"↕"}</span></th>`;
-  box.innerHTML=`<div class="tblScroll"><table class="oTable"><thead><tr>${th("num","Číslo")}${th("cl","Klient / objednávka")}${th("del","Dodanie")}${th("dist","Distribúcia")}${th("cnt","Ks","n")}${th("sum","Suma bez DPH","n")}${th("st","Stav")}${th("own","Obchodník")}<th class="noSort"></th></tr></thead><tbody>`+
-    list.map(x=>{ const s=S(x), st=stOf(x.status), dd=daysTo(s.delivery), open=["draft","sent","confirmed"].includes(x.status||"draft");
+  box.innerHTML=`<div class="tblScroll"><table class="oTable"><thead><tr>${th("num","Číslo")}${th("cl","Klient / objednávka")}${th("del","Dodanie / distribúcia")}${th("cnt","Ks","n")}${th("sum","Suma bez DPH","n")}${th("st","Stav")}${th("own","Obchodník")}<th class="noSort"></th></tr></thead><tbody>`+
+    list.map(x=>{ const s=S(x), st=stOf(x.status), dd=daysTo(s.delivery), open=["draft","sent"].includes(stKey(x.status));
       const badge= open && dd>=0 && dd<=7 ? `<span class="soon">${dd===0?"dnes":dd===1?"zajtra":"o "+dd+" dni"}</span>` : "";
       const canDel = x.ownerUid===Store.uid || Store.isAdmin;
       return `<tr data-row="${x.id}" class="${x.status==="cancelled"?"cx":""}">
       <td class="num">${esc(x.number||"—")}<br><span>${esc(fmtD(x.date))}</span></td>
       <td><div class="cl">${esc(x.client?.name||"Bez klienta")}</div><div class="ref" title="${esc(x.title||"")}">${esc(x.title||"")}</div><div class="svChips">${(s.services||[]).map(n=>`<span>${esc(n)}</span>`).join("")}</div></td>
-      <td class="dt">${esc(fmtD(s.delivery))||"—"}${badge}</td>
-      <td class="dt">${esc(fmtRange(s.distFrom,s.distTo))||"—"}</td>
+      <td class="dt">${esc(fmtD(s.delivery))||"—"}${badge}${(s.distFrom||s.distTo)?`<small>distr. ${esc(fmtRange(s.distFrom,s.distTo))}</small>`:""}</td>
       <td class="n">${s.count?fmtInt(s.count):"—"}</td>
       <td class="n">${s.total?fmtSum(s.total):"—"}</td>
       <td><button class="st" data-st="${x.id}" title="Zmeniť stav"><i style="background:${st.c}"></i>${st.l}<span class="cv">▾</span></button></td>
       <td class="ow">${esc(x.ownerName||"—")}<small>${esc(fmtStamp(x.updatedAt||x.createdAt))}</small></td>
-      <td><div class="acts"><button data-copy="${x.id}">Kópia ▾</button>${canDel?`<button class="del" data-del="${x.id}" title="Zmazať" aria-label="Zmazať"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></button>`:""}</div></td></tr>`; }).join("")+
+      <td><div class="acts"><button data-copy="${x.id}" title="Kópia objednávky" aria-label="Kópia"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></svg></button>${canDel?`<button class="del" data-del="${x.id}" title="Zmazať" aria-label="Zmazať"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></button>`:""}</div></td></tr>`; }).join("")+
     `</tbody></table></div><div class="lCount">Zobrazených ${list.length} z ${allOrders.length} objednávok</div>`;
 }
-$("#fSearch").addEventListener("input",e=>{ F.q=e.target.value; drawList(); });
+$("#fSearch").addEventListener("input",e=>{ F.q=e.target.value; if(curView!=="list") show("list"); else drawList(); });
 $("#fOwner").addEventListener("change",e=>{ F.owner=e.target.value; drawList(); });
 $("#fMonth").addEventListener("change",e=>{ F.month=e.target.value; drawList(); });
-$("#fClear").addEventListener("click",()=>{ Object.assign(F,{q:"",owner:"",month:"",status:"",svc:""}); $("#fSearch").value=""; drawList(); });
+$("#fChips").addEventListener("click",e=>{ const b=e.target.closest("[data-chip]"); if(!b) return; F[b.dataset.chip]=""; drawList(); });
+$("#fClient").addEventListener("click",e=>{ const b=e.target.closest("[data-fcl]"); if(!b) return; F.client=b.dataset.fcl; drawList(); });
+$("#bClients").addEventListener("click",()=>{ $("#app").classList.remove("open"); openClients(); });
+$("#fClear").addEventListener("click",()=>{ Object.assign(F,{q:"",owner:"",month:"",status:"",svc:"",client:""}); $("#fSearch").value=""; drawList(); });
 $("#fStatus").addEventListener("click",e=>{ const b=e.target.closest("[data-fst]"); if(!b) return; F.status=b.dataset.fst; drawList(); });
 $("#fSvc").addEventListener("click",e=>{ const b=e.target.closest("[data-fsv]"); if(!b) return; F.svc=F.svc===b.dataset.fsv?"":b.dataset.fsv; drawList(); });
 $("#oList").addEventListener("click", async e=>{
@@ -1260,13 +1422,17 @@ $("#oList").addEventListener("click", async e=>{
   const find=id=>allOrders.find(x=>x.id===id);
   const b=e.target.closest("button");
   if(b?.dataset.st){ const x=find(b.dataset.st);
-    openMenu(b, [{head:"Zmeniť stav"}, ...STATUSES.map(s=>({html:`<i style="background:${s.c}"></i>${s.l}`, disabled:(x.status||"draft")===s.k, k:s.k}))], it=>setStatus(x, it.k)); return; }
+    openMenu(b, [{head:"Zmeniť stav"}, ...STATUSES.map(s=>({html:`<i style="background:${s.c}"></i>${s.l}`, disabled:stKey(x.status)===s.k, k:s.k}))], it=>setStatus(x, it.k)); return; }
   if(b?.dataset.copy){ const x=find(b.dataset.copy);
     openMenu(b, [{head:"Kópia objednávky"},
       {html:`<span>Presná kópia<small>rovnaké termíny, nové číslo</small></span>`, next:false},
-      {html:`<span>Na ďalší mesiac<small>termíny +1 mesiac, posunie názov</small></span>`, next:true}], it=>{
+      {html:`<span>Na ďalší mesiac<small>termíny +1 mesiac, ďalšie číslo klienta</small></span>`, next:true},
+      {html:`<span>Ako podklad pre iného klienta<small>bez údajov klienta – vyberiete nového</small></span>`, other:true}], it=>{
         if(dirty && !confirm("Neuložené zmeny v otvorenej objednávke sa stratia. Pokračovať?")) return;
-        O=copyOrder(x, it.next); dirty=true; show("editor"); toast(it.next?"Kópia na ďalší mesiac – skontrolujte termíny a uložte.":"Kópia vytvorená – upravte a uložte."); }); return; }
+        O=copyOrder(x, !!it.next);
+        if(it.other){ O.clientKey=""; O.client=blankClient(); O.quoteRef=null; O.title=""; O.titleAuto=true; O.code=""; AD().item=""; }
+        dirty=true; show("editor");
+        toast(it.other?"Podklad vytvorený – vyberte alebo vyplňte nového klienta.":it.next?"Kópia na ďalší mesiac – skontrolujte termíny a uložte.":"Kópia vytvorená – upravte a uložte.",3500); }); return; }
   if(b?.dataset.del){ const x=find(b.dataset.del); if(!confirm(`Naozaj zmazať objednávku ${x.number||""} (${x.client?.name||""})?\nTáto akcia sa nedá vrátiť.`)) return;
     try{ await Store.deleteOrder(x.id); allOrders=allOrders.filter(y=>y.id!==x.id); if(O?.id===x.id){ O=newOrder(); dirty=false; } updateCount(); drawList(); toast("Objednávka zmazaná."); }catch(err){ toast("Túto objednávku môže zmazať len jej autor."); } return; }
   const tr=e.target.closest("tr[data-row]"); if(!tr) return;
@@ -1299,7 +1465,7 @@ function openMenu(anchor, items, onPick){
   menu.onclick=e=>{ const b=e.target.closest("button[data-i]"); if(!b||b.disabled) return; closeMenu(); onPick(items[+b.dataset.i]); };
 }
 document.addEventListener("click", e=>{ if(!menu.hidden && Date.now()-menu.openedAt>60 && !menu.contains(e.target)) closeMenu(); });
-document.addEventListener("keydown", e=>{ if(e.key==="Escape"){ closeMenu(); $("#mQuote").hidden=true; } });
+document.addEventListener("keydown", e=>{ if(e.key==="Escape"){ closeMenu(); $("#mQuote").hidden=true; $("#mCl").hidden=true; } });
 $("#vList").addEventListener("scroll", ()=>{ if(!menu.hidden && Date.now()-menu.openedAt>400) closeMenu(); }, {passive:true});
 
 /* ════════════════ import z cenovej ponuky ════════════════ */
@@ -1336,6 +1502,65 @@ function applyQuote(q){
   renderForm(); schedulePreview(); toast("Načítané z ponuky "+(q.number||"")+". Skontrolujte ceny a doplňte termíny.",3500);
 }
 
+/* ════════════════ stáli klienti ════════════════ */
+let clEdit=null, clAfter=null, clFromEditor=false;
+const CLF=[["name","Názov spoločnosti (do objednávky)"],["person","Kontaktná osoba"],["address","Adresa"],["ico","IČO"],["icdph","IČ DPH"],["dic","DIČ"],["email","E-mail"],["phone","Telefón"]];
+function openClients(edit, after){ clEdit=edit||null; clAfter=after||null; clFromEditor=!!edit; $("#mCl").hidden=false; drawClients(); }
+function drawClients(){
+  const B=$("#mClB"), y=String(new Date().getFullYear());
+  if(clEdit){ const c=clEdit;
+    $("#mClT").textContent=c._new?"Nový stály klient":"Upraviť stáleho klienta";
+    B.innerHTML=`<div class="grid2"><div class="fld"><label>Názov v evidencii</label><input id="cN" placeholder="napr. Möbelix"></div>
+        <div class="fld"><label>Kód do čísla objednávky</label><input id="cC" maxlength="10" placeholder="napr. MOB" style="text-transform:uppercase"></div></div>
+      <div class="grid2"><div class="fld"><label>Posledné použité číslo v roku ${y}</label><input id="cS" inputmode="numeric" placeholder="0"></div>
+        <div class="fld"><label>Ďalšia objednávka dostane číslo</label><input id="cP" readonly></div></div>
+      <p class="hint">Ak ste pre klienta tento rok už objednávky vystavili (napr. 04_2026), zadajte posledné číslo – ďalšia bude 05.</p>
+      <div class="sub">Údaje klienta – doplnia sa do objednávky</div>
+      ${CLF.map(([k,l])=>`<div class="fld"><label>${l}</label><input data-cf="${k}"></div>`).join("")}
+      <div style="display:flex; gap:8px; margin-top:6px; flex-wrap:wrap"><button class="btn" type="button" data-cl="back">${clFromEditor?"Zrušiť":"← Späť"}</button>
+        ${!c._new?`<button class="btn" type="button" data-cl="del" style="color:var(--red)">Odstrániť</button>`:""}<span style="flex:1"></span>
+        <button class="btn primary" type="button" data-cl="save">Uložiť klienta</button></div>`;
+    $("#cN").value=c.name||""; $("#cC").value=c.code||""; $("#cS").value=c.seq?.[y]||"";
+    CLF.forEach(([k])=>{ B.querySelector(`[data-cf="${k}"]`).value=(c.client||{})[k]||""; });
+    const pv=()=>{ const code=clCode($("#cC").value)||"KÓD"; $("#cP").value=`${code}-${y}-${String((parseInt($("#cS").value)||0)+1).padStart(2,"0")}`; };
+    $("#cC").oninput=pv; $("#cS").oninput=pv; pv(); $("#cN").focus(); return; }
+  $("#mClT").textContent="Stáli klienti";
+  const L=clients.filter(c=>!c.archived).sort((a,b)=>a.name.localeCompare(b.name,"sk"));
+  B.innerHTML=`<p class="hint" style="margin:0">Klienti, pre ktorých vystavujete objednávky pravidelne. Každý má vlastný číselný rad (napr. MOB-${y}-05) a v evidencii vlastnú dlaždicu vo filtri. Ostatní klienti sa číslujú bežne.</p>
+    <div class="clList">${L.length? L.map(c=>`<button type="button" data-cledit="${esc(c.id)}"><b>${esc(c.name)}</b><span class="code">${esc(c.code)}</span>
+      <span>${esc(c.client?.name||"")}</span><span>ďalšie: ${esc(c.code)}-${y}-${String((+c.seq?.[y]||0)+1).padStart(2,"0")} · ${allOrders.filter(x=>x.clientKey===c.id).length} obj.</span></button>`).join("")
+      : `<div class="empty" style="padding:24px">Zatiaľ žiadny stály klient.</div>`}</div>
+    <button class="btn primary" type="button" data-cl="new">+ Nový stály klient</button>`;
+}
+function clCode(v){ return String(v||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,10); }
+$("#mCl").addEventListener("click", async e=>{
+  if(e.target===e.currentTarget || e.target.closest("[data-close]")){ $("#mCl").hidden=true; return; }
+  const ed=e.target.closest("[data-cledit]"); if(ed){ clEdit=clone(clientById(ed.dataset.cledit)); drawClients(); return; }
+  const b=e.target.closest("[data-cl]"); if(!b) return; const a=b.dataset.cl, y=String(new Date().getFullYear());
+  if(a==="new"){ clEdit={_new:true, name:"", code:"", client:{}, seq:{}}; drawClients(); return; }
+  if(a==="back"){ if(clFromEditor){ $("#mCl").hidden=true; return; } clEdit=null; drawClients(); return; }
+  if(a==="del"){ if(!confirm(`Odstrániť stáleho klienta „${clEdit.name}“?\nJeho objednávky ostanú, v evidencii sa presunú medzi Ostatných klientov.`)) return;
+    try{ await Store.deleteClient(clEdit.id); clients=clients.filter(c=>c.id!==clEdit.id); clEdit=null; drawClients(); drawList(); toast("Klient odstránený."); }
+    catch(err){ toast("Klienta sa nepodarilo odstrániť ("+(err.code||"chyba")+")."); } return; }
+  if(a==="save"){
+    const name=$("#cN").value.trim(), code=clCode($("#cC").value), seqN=parseInt($("#cS").value)||0;
+    if(!name){ toast("Doplňte názov klienta."); return; }
+    if(code.length<2){ toast("Kód musí mať aspoň 2 znaky (písmená alebo čísla)."); return; }
+    if(clients.some(c=>c.id!==clEdit.id && c.code===code)){ toast("Kód "+code+" už používa iný klient."); return; }
+    const client={}; CLF.forEach(([k])=>{ client[k]=$("#mClB").querySelector(`[data-cf="${k}"]`).value.trim(); });
+    const c={ id: clEdit.id || ("k"+Date.now().toString(36)+Math.random().toString(36).slice(2,5)), name, code, client, archived:false,
+      seq:{[y]:seqN}, updatedAt:new Date().toISOString(), updatedByName:Store.me?.name||"" };
+    if(clEdit._new){ c.createdAt=c.updatedAt; c.createdByUid=Store.uid; }
+    b.disabled=true;
+    try{ await Store.saveClient(c); const i=clients.findIndex(x=>x.id===c.id); const merged=Object.assign({}, clients[i]||{}, c, {seq:Object.assign({}, clients[i]?.seq, c.seq)});
+      if(i>=0) clients[i]=merged; else clients.push(merged);
+      toast("Klient "+name+" uložený."); const after=clAfter; clAfter=null;
+      if(clFromEditor){ $("#mCl").hidden=true; } else { clEdit=null; drawClients(); }
+      if(after) after(merged); drawList(); }
+    catch(err){ console.error(err); toast(err.code==="permission-denied"?"Na uloženie klienta treba doplniť pravidlo „objKlienti“ vo Firebase.":"Klienta sa nepodarilo uložiť ("+(err.code||"chyba")+").",6000); }
+    b.disabled=false; }
+});
+
 /* ════════════════ profil ════════════════ */
 const PF={pFirst:"first",pLast:"last",pTitle:"title",pPos:"position",pPhone:"phone",pEmail:"email",pCompany:"company",pAddr:"address",pIco:"ico",pIcdph:"icdph",pDic:"dic"};
 function fillProfileForm(){ Object.entries(PF).forEach(([id,k])=>$("#"+id).value=profile[k]||""); }
@@ -1345,19 +1570,24 @@ $("#pSave").addEventListener("click", async ()=>{
   try{ await Store.setProfile(upd); Object.assign(profile,upd); toast("Profil uložený."); updateWho(); show(O?.saved||dirty?"editor":"list"); }
   catch(e){ toast("Profil sa nepodarilo uložiť."); }
 });
-function updateWho(){ $("#whoTop").textContent = fullName(profile) ? fullName(profile)+(profile.position?" · "+profile.position:"") : ""; }
+function updateWho(){ $("#whoName").textContent=fullName(profile)||""; $("#whoPos").textContent=profile.position||""; $("#whoAv").textContent=(profile.first||profile.last)? initials(profile) : ""; }
 
 /* ════════════════ navigácia ════════════════ */
 let curView="list";
 function show(v){
   curView=v; closeMenu();
-  $$(".nav button").forEach(b=>b.classList.toggle("on", b.dataset.view===v));
+  $$(".tNav button[data-view]").forEach(b=>b.classList.toggle("on", b.dataset.view===v));
+  $("#app").classList.toggle("rail", v==="editor"); $("#app").classList.remove("open");
+  $("#sFilters").hidden = v!=="list";
   $("#vEditor").hidden = v!=="editor"; $("#vList").hidden = v!=="list"; $("#vProfile").hidden = v!=="profile";
   if(v==="editor"){ if(!O) O=newOrder(); renderForm(); renderPreview(); }
   if(v==="list") renderList();
   if(v==="profile") fillProfileForm();
 }
-$$(".nav button").forEach(b=>b.addEventListener("click",()=>show(b.dataset.view)));
+$$(".tNav button[data-view]").forEach(b=>b.addEventListener("click",()=>show(b.dataset.view)));
+$("#bMenu").addEventListener("click",()=>$("#app").classList.add("open"));
+$("#sShade").addEventListener("click",()=>$("#app").classList.remove("open"));
+addEventListener("resize",()=>{ if(curView==="editor") fitPreview(); });
 $$(".mobileSwitch button").forEach(b=>b.addEventListener("click",()=>{
   $$(".mobileSwitch button").forEach(x=>x.classList.toggle("on",x===b));
   $("#editor").classList.toggle("showPreview", b.dataset.m==="preview");
@@ -1406,14 +1636,14 @@ $("#lDemo").addEventListener("click", async ()=>{
   Store.startDemo(); $("#login").hidden=true; $("#demoBar").hidden=false;
   const p=lsGet("profile"); profile=Object.assign(blankProfile(), p||{first:"Miroslava",last:"Stalmašková",position:"Business Development",email:"miroslava.stalmaskova@cromwell.sk",phone:"+421 900 000 000"});
   if(!p) lsSet("profile",profile);
-  $("#storeMode").textContent="· skúšobný režim"; updateWho(); show("list");
+  $("#storeMode").textContent="skúšobný režim"; updateWho(); show("list");
 });
 async function afterLogin(me){
   $("#login").hidden=true;
   try{ const p=await Store.getProfile(); if(p) profile=Object.assign(blankProfile(),p); }catch(e){ console.warn(e); }
   if(!profile.first){ const parts=(me.name||"").trim().split(/\s+/); profile.first=parts.shift()||""; profile.last=parts.join(" "); if(!profile.email) profile.email=me.email;
     try{ await Store.setProfile({first:profile.first,last:profile.last,email:profile.email}); }catch(e){} }
-  $("#storeMode").textContent="· "+me.name; updateWho();
+  $("#storeMode").textContent=""; updateWho();
   show("list");
   if(!profile.position || !profile.phone) toast("Tip: v Mojom profile doplňte pozíciu a telefón – zobrazia sa v objednávke.",4500);
 }
